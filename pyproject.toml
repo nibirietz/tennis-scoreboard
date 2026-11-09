@@ -1,0 +1,22 @@
+[project]
+name = "tennis-scoreboard"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "nibirietz", email = "nibirietz@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "msgspec>=0.22.0",
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "waitress>=3.0.2",
+]
+
+[project.scripts]
+tennis-scoreboard = "tennis_scoreboard:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"

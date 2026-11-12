@@ -22,8 +22,15 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.40.2",
     "pytest>=9.2.0",
+    "ruff>=0.17.4",
 ]
+
+
+[tool.basedpyright]
+include = ["src", "test"]
+
 
 [tool.pytest]
 minversion = "9.0"

@@ -317,17 +317,23 @@ source = { editable = "." }
 dependencies = [
     { name = "msgspec" },
     { name = "mypy" },
-    { name = "pytest" },
     { name = "waitress" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "msgspec", specifier = ">=0.22.0" },
     { name = "mypy", specifier = ">=2.4.1" },
-    { name = "pytest", specifier = ">=9.2.0" },
     { name = "waitress", specifier = ">=3.0.2" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest", specifier = ">=9.2.0" }]
 
 [[package]]
 name = "typing-extensions"

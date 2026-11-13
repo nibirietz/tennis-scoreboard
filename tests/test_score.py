@@ -33,3 +33,12 @@ def test_set_deuce_after_mistake():
     assert score.get_points(Side.SECOND) == 3
     assert score.get_games(Side.FIRST) == 0
     assert score.get_games(Side.SECOND) == 0
+
+
+def test_set_first_player_wins_game_after_deuce():
+    score = Score([4, 3], [0, 0], [0, 0])
+    score.add_points(Side.FIRST)
+    assert score.get_games(Side.FIRST) == 1
+    assert score.get_games(Side.SECOND) == 0
+    assert score.get_points(Side.FIRST) == 0
+    assert score.get_points(Side.SECOND) == 0

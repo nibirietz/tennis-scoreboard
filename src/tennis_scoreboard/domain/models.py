@@ -35,29 +35,28 @@ class Score:
 
     def get_points(self, side: Side) -> int:
         return self._game_points[side]
-        
 
     def get_games(self, side: Side) -> int:
         return self._set_games[side]
 
     def reset_game_points(self):
         self._game_points = [0, 0]
-    
+
     def set_game_deuce(self):
         self._game_points = [3, 3]
-    
 
     def add_points(self, side: Side):
         self._game_points[side] += 1
         if self._game_points[side] == 4 and self._game_points[side.opponent] == 4:
             self.set_game_deuce()
-        elif self._game_points[side] == 4 and self._game_points[side.opponent] != 3:
+        elif (
+            self._game_points[side] == 4 and self._game_points[side.opponent] != 3
+        ) or self._game_points[side] == 5:
             self.reset_game_points()
             self.add_game(side)
 
     def add_game(self, side: Side):
         self._set_games[side] += 1
-
 
 
 @dataclass

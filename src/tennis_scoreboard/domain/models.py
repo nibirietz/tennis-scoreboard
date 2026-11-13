@@ -10,14 +10,16 @@ class Player:
 
 @dataclass
 class Score:
-    game: list[int]
-    sets: list[int]
+    game_points: list[int]
+    set_games: list[int]
+    match_sets: list[int]
 
     @classmethod
     def new(cls):
         return cls(
-            game=[0, 0],
-            sets=[0, 0],
+            game_points=[0, 0],
+            set_games=[0, 0],
+            match_sets=[0, 0],
         )
 
 

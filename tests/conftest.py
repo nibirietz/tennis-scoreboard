@@ -14,7 +14,7 @@ class FakeRepository:
                 player1=Player(1, "Alex"),
                 player2=Player(2, "Michael"),
                 winner=None,
-                score=Score([0, 0], [0, 0]),
+                score=Score.new(),
             )
         ]
 

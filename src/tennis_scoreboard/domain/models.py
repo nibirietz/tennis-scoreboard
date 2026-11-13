@@ -29,10 +29,13 @@ class Score:
             _match_sets=[0, 0],
         )
 
-    
+    def get_points(self, side: Side):
+        return self._game_points[side]
+        
 
     def add_points(self, side: Side):
-        pass
+        self._game_points[side] += 1
+
 
 
 @dataclass

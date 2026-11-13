@@ -1,13 +1,11 @@
-import uuid
 from typing import Protocol
+from uuid import UUID
 
 from tennis_scoreboard.domain.models import Match, Player
 
 
 class RepositoryProtocol(Protocol):
-    def get_match_by_id(self, id: int) -> Match | None: ...
-
-    def get_match_by_uuid(self, uuid: uuid.UUID) -> Match | None: ...
+    def get_match_by_uuid(self, uuid: UUID) -> Match | None: ...
 
     def add_match(self, match: Match): ...
 

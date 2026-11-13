@@ -8,15 +8,16 @@ class Player:
     name: str
 
 
-@dataclass(slots=True)
-class MatchParticipant:
-    player: Player
-    score: int
+@dataclass
+class Score:
+    game: list[int]
+    sets: list[int]
 
 
 @dataclass
 class Match:
     uuid: UUID
-    player1: MatchParticipant
-    player2: MatchParticipant
+    player1: Player
+    player2: Player
     winner: Player | None
+    score: Score

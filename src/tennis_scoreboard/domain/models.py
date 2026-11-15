@@ -49,7 +49,7 @@ class Score:
     def is_deuce(self) -> bool:
         return self._game_points[Side.FIRST] == self._game_points[Side.SECOND] == 4
 
-    def is_win(self, side: Side) -> bool:
+    def is_winning_game(self, side: Side) -> bool:
         return (
             self._game_points[side] == 4 and self._game_points[side.opponent] != 3
         ) or self._game_points[side] == 5
@@ -58,9 +58,15 @@ class Score:
         self._game_points[side] += 1
         if self.is_deuce():
             self.set_game_deuce()
-        elif self.is_win(side):
+        elif self.is_winning_game(side):
             self.reset_game_points()
             self.add_game(side)
+
+    def is_winning_set(self, side: Side):
+        return self._set_games[side] == 6 and self._set_games[side.opponent] != 5
+
+    def is_tie_break(self):
+        return self._set_games[Side.FIRST] == self._set_games[Side.SECOND] == 6
 
     def add_game(self, side: Side):
         self._set_games[side] += 1

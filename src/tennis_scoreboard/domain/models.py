@@ -64,10 +64,7 @@ class Score:
         return self._set_games[Side.FIRST] == self._set_games[Side.SECOND] == 6
 
     def is_winning_tie_break(self, side: Side) -> bool:
-        return (
-            self._game_points[side] >= 7
-            and self._game_points[side] - self._game_points[side.opponent] >= 2
-        )
+        return self._game_points[side] == 7
 
     def add_points(self, side: Side):
         self._game_points[side] += 1

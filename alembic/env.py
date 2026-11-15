@@ -1,7 +1,9 @@
+import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
+from sqlalchemy.engine import URL
 
 from alembic import context
 from tennis_scoreboard.repository.orm_models import Base
@@ -19,12 +21,23 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+load_dotenv()
+
+db_url = URL.create(
+    drivername="postgresql+psycopg",
+    username=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    host=os.getenv("DB_HOST", "localhost"),
+    port=int(os.getenv("DB_PORT", 5432)),
+    database=os.getenv("POSTGRES_DB"),
+)
+config.set_main_option("sqlalchemy.url", db_url.render_as_string(hide_password=False))
 
 
 def run_migrations_offline() -> None:

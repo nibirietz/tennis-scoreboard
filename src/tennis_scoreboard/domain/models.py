@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import Self
 from uuid import UUID
 
 
@@ -9,7 +10,7 @@ class Side(IntEnum):
     SECOND = 1
 
     @property
-    def opponent(self):
+    def opponent(self) -> Side:
         return Side(1 - self.value)
 
 
@@ -26,7 +27,7 @@ class Score:
     _match_sets: list[int]
 
     @classmethod
-    def new(cls) -> Self:
+    def new(cls) -> Score:
         return cls(
             _game_points=[0, 0],
             _set_games=[0, 0],
@@ -68,7 +69,7 @@ class Match:
     score: Score
 
     @classmethod
-    def new(cls, uuid: UUID, player1: Player, player2: Player) -> Self:
+    def new(cls, uuid: UUID, player1: Player, player2: Player) -> Match:
         return cls(
             uuid=uuid, player1=player1, player2=player2, winner=None, score=Score.new()
         )

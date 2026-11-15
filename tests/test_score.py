@@ -3,14 +3,14 @@ from tennis_scoreboard.domain.models import Score, Side
 
 def test_add_point_in_new_match():
     score = Score.new()
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_points(Side.FIRST) == 1
     assert score.get_points(Side.SECOND) == 0
 
 
 def test_first_player_wins_game():
     score = Score([3, 2], [0, 0], [0, 0])
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_games(Side.FIRST) == 1
     assert score.get_games(Side.SECOND) == 0
     assert score.get_points(Side.FIRST) == 0
@@ -19,7 +19,7 @@ def test_first_player_wins_game():
 
 def test_first_player_add_point_in_deuce():
     score = Score([3, 3], [0, 0], [0, 0])
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_points(Side.FIRST) == 4
     assert score.get_points(Side.SECOND) == 3
     assert score.get_games(Side.FIRST) == 0
@@ -28,7 +28,7 @@ def test_first_player_add_point_in_deuce():
 
 def test_set_deuce_after_mistake():
     score = Score([4, 3], [0, 0], [0, 0])
-    score.add_points(Side.SECOND)
+    score.add_point(Side.SECOND)
     assert score.get_points(Side.FIRST) == 3
     assert score.get_points(Side.SECOND) == 3
     assert score.get_games(Side.FIRST) == 0
@@ -37,7 +37,7 @@ def test_set_deuce_after_mistake():
 
 def test_first_player_wins_game_after_deuce():
     score = Score([4, 3], [0, 0], [0, 0])
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_games(Side.FIRST) == 1
     assert score.get_games(Side.SECOND) == 0
     assert score.get_points(Side.FIRST) == 0
@@ -46,7 +46,7 @@ def test_first_player_wins_game_after_deuce():
 
 def test_first_player_wins_set():
     score = Score([3, 2], [5, 4], [0, 0])
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_sets(Side.FIRST) == 1
     assert score.get_sets(Side.SECOND) == 0
     assert score.get_games(Side.FIRST) == 0
@@ -55,7 +55,7 @@ def test_first_player_wins_set():
 
 def test_first_player_wins_set_6_5():
     score = Score([3, 2], [6, 5], [0, 0])
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_sets(Side.FIRST) == 1
     assert score.get_sets(Side.SECOND) == 0
     assert score.get_games(Side.FIRST) == 0
@@ -64,7 +64,7 @@ def test_first_player_wins_set_6_5():
 
 def test_add_point_in_tie_break():
     score = Score([0, 0], [6, 6], [0, 0])
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_points(Side.FIRST) == 1
     assert score.get_points(Side.SECOND) == 0
     assert score.get_games(Side.FIRST) == 6
@@ -73,7 +73,7 @@ def test_add_point_in_tie_break():
 
 def test_first_player_wins_tie_break():
     score = Score([6, 5], [6, 6], [0, 0])
-    score.add_points(Side.FIRST)
+    score.add_point(Side.FIRST)
     assert score.get_sets(Side.FIRST) == 1
     assert score.get_sets(Side.SECOND) == 0
     assert score.get_games(Side.FIRST) == 0

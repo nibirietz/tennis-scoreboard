@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from enum import IntEnum
 from uuid import UUID
 
+from tennis_scoreboard.exceptions import MatchUnknownPlayer
+
 
 class Side(IntEnum):
     FIRST = 0
@@ -103,12 +105,7 @@ class Match:
 
     @classmethod
     def new(cls, uuid: UUID, player1: Player, player2: Player) -> Match:
-        return cls(
-            uuid=uuid, player1=player1, player2=player2, winner=None, score=Score.new()
-        )
-
-    def add_point(self, side: Side):
-        self.score.add_point(side)
+        return cls(uuid=uuid, player1=player1, player2=player2, score=Score.new())
 
     @property
     def winner(self) -> Player | None:
@@ -116,3 +113,13 @@ class Match:
             return self.player1
         if self.score.get_sets(Side.SECOND) == 2:
             return self.player2
+
+    def add_point(self, player: Player):
+        if player.id == self.player1.id:
+            side = Side.FIRST
+        elif player.id == self.player2.id:
+            side = Side.SECOND
+        else:
+            raise MatchUnknownPlayer("Неизвестный участник матча.")
+        if self.winner is None:
+            self.score.add_point(side)

@@ -1,0 +1,2 @@
+class MatchUnknownPlayer(Exception):
+    pass

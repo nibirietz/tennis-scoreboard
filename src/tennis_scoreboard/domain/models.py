@@ -46,13 +46,19 @@ class Score:
     def set_game_deuce(self):
         self._game_points = [3, 3]
 
+    def is_deuce(self) -> bool:
+        return self._game_points[Side.FIRST] == self._game_points[Side.SECOND] == 4
+
+    def is_win(self, side: Side) -> bool:
+        return (
+            self._game_points[side] == 4 and self._game_points[side.opponent] != 3
+        ) or self._game_points[side] == 5
+
     def add_points(self, side: Side):
         self._game_points[side] += 1
-        if self._game_points[side] == 4 and self._game_points[side.opponent] == 4:
+        if self.is_deuce():
             self.set_game_deuce()
-        elif (
-            self._game_points[side] == 4 and self._game_points[side.opponent] != 3
-        ) or self._game_points[side] == 5:
+        elif self.is_win(side):
             self.reset_game_points()
             self.add_game(side)
 

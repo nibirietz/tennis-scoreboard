@@ -43,54 +43,54 @@ class Score:
     def get_sets(self, side: Side) -> int:
         return self._match_sets[side]
 
-    def reset_game_points(self):
+    def _reset_game_points(self):
         self._game_points = [0, 0]
 
-    def reset_set_games(self):
+    def _reset_set_games(self):
         self._set_games = [0, 0]
 
-    def set_game_deuce(self):
+    def _set_game_deuce(self):
         self._game_points = [3, 3]
 
-    def is_deuce(self) -> bool:
+    def _is_deuce(self) -> bool:
         return self._game_points[Side.FIRST] == self._game_points[Side.SECOND] == 4
 
-    def is_winning_game(self, side: Side) -> bool:
+    def _is_winning_game(self, side: Side) -> bool:
         return (
             self._game_points[side] == 4 and self._game_points[side.opponent] != 3
         ) or self._game_points[side] == 5
 
-    def is_tie_break(self) -> bool:
+    def _is_tie_break(self) -> bool:
         return self._set_games[Side.FIRST] == self._set_games[Side.SECOND] == 6
 
-    def is_winning_tie_break(self, side: Side) -> bool:
+    def _is_winning_tie_break(self, side: Side) -> bool:
         return self._game_points[side] == 7
 
-    def add_points(self, side: Side):
+    def add_point(self, side: Side):
         self._game_points[side] += 1
-        if self.is_tie_break():
-            if self.is_winning_tie_break(side):
-                self.reset_game_points()
-                self.add_game(side)
+        if self._is_tie_break():
+            if self._is_winning_tie_break(side):
+                self._reset_game_points()
+                self._add_game(side)
         else:
-            if self.is_deuce():
-                self.set_game_deuce()
-            elif self.is_winning_game(side):
-                self.reset_game_points()
-                self.add_game(side)
+            if self._is_deuce():
+                self._set_game_deuce()
+            elif self._is_winning_game(side):
+                self._reset_game_points()
+                self._add_game(side)
 
-    def is_winning_set(self, side: Side) -> bool:
+    def _is_winning_set(self, side: Side) -> bool:
         return (
             self._set_games[side] == 6 and self._set_games[side.opponent] != 5
         ) or self._set_games[side] == 7
 
-    def add_game(self, side: Side):
+    def _add_game(self, side: Side):
         self._set_games[side] += 1
-        if self.is_winning_set(side):
-            self.reset_set_games()
-            self.add_set(side)
+        if self._is_winning_set(side):
+            self._reset_set_games()
+            self._add_set(side)
 
-    def add_set(self, side: Side):
+    def _add_set(self, side: Side):
         self._match_sets[side] += 1
 
 
@@ -99,7 +99,6 @@ class Match:
     uuid: UUID
     player1: Player
     player2: Player
-    winner: Player | None
     score: Score
 
     @classmethod
@@ -107,3 +106,13 @@ class Match:
         return cls(
             uuid=uuid, player1=player1, player2=player2, winner=None, score=Score.new()
         )
+
+    def add_point(self, side: Side):
+        self.score.add_point(side)
+
+    @property
+    def winner(self) -> Player | None:
+        if self.score.get_sets(Side.FIRST) == 2:
+            return self.player1
+        if self.score.get_sets(Side.SECOND) == 2:
+            return self.player2

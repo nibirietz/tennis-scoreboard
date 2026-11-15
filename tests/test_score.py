@@ -51,3 +51,14 @@ def test_first_player_wins_set():
     assert score.get_sets(Side.SECOND) == 0
     assert score.get_games(Side.FIRST) == 0
     assert score.get_games(Side.SECOND) == 0
+
+
+def test_first_player_wins_tie_break():
+    score = Score([6, 5], [6, 6], [0, 0])
+    score.add_points(Side.FIRST)
+    assert score.get_sets(Side.FIRST) == 1
+    assert score.get_sets(Side.SECOND) == 0
+    assert score.get_games(Side.FIRST) == 0
+    assert score.get_games(Side.SECOND) == 0
+    assert score.get_points(Side.FIRST) == 0
+    assert score.get_points(Side.SECOND) == 0

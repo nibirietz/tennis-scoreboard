@@ -63,17 +63,29 @@ class Score:
     def is_tie_break(self) -> bool:
         return self._set_games[Side.FIRST] == self._set_games[Side.SECOND] == 6
 
+    def is_winning_tie_break(self, side: Side) -> bool:
+        return (
+            self._game_points[side] >= 7
+            and self._game_points[side] - self._game_points[side.opponent] >= 2
+        )
+
     def add_points(self, side: Side):
         self._game_points[side] += 1
-        if self.is_deuce():
-            self.set_game_deuce()
-        elif self.is_winning_game(side):
-            self.reset_game_points()
-            self.add_game(side)
+        if self.is_tie_break():
+            if self.is_winning_tie_break(side):
+                self.reset_game_points()
+                self.add_game(side)
+        else:
+            if self.is_deuce():
+                self.set_game_deuce()
+            elif self.is_winning_game(side):
+                self.reset_game_points()
+                self.add_game(side)
 
     def is_winning_set(self, side: Side) -> bool:
-        return self._set_games[side] == 6 and self._set_games[side.opponent] != 5
-
+        return (
+            self._set_games[side] == 6 and self._set_games[side.opponent] != 5
+        ) or self._set_games[side] == 7
 
     def add_game(self, side: Side):
         self._set_games[side] += 1
@@ -83,7 +95,6 @@ class Score:
 
     def add_set(self, side: Side):
         self._match_sets[side] += 1
-            
 
 
 @dataclass

@@ -10,6 +10,7 @@ requires-python = ">=3.14"
 dependencies = [
     "msgspec>=0.22.0",
     "mypy>=2.4.1",
+    "sqlalchemy>=2.1.8",
     "waitress>=3.0.2",
 ]
 

@@ -1,1 +1,0 @@
-from tennis_scoreboard.repository.repository_protocol import RepositoryProtocol

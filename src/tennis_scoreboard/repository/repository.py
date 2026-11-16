@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from tennis_scoreboard.domain.models import Match, Player, Score
+from tennis_scoreboard.domain.models import Match, Player, Score, Side
 from tennis_scoreboard.repository.orm_models import MatchORM, PlayerORM
 
 
@@ -32,7 +32,34 @@ class SQLAlchemyRepository:
             score=self.score_to_model(match.score),
         )
 
+    def score_to_dict(self, score: Score) -> dict[str, list[int]]:
+        return {
+            "game_points": [
+                score.get_points(Side.FIRST),
+                score.get_points(Side.SECOND),
+            ],
+            "set_games": [score.get_games(Side.FIRST), score.get_games(Side.SECOND)],
+            "match_sets": [score.get_sets(Side.FIRST), score.get_sets(Side.SECOND)],
+        }
+
+    def match_to_orm(self, match: Match):
+        return MatchORM(
+            uuid=match.uuid,
+            player1_id=match.player1.id,
+            player2_id=match.player2.id,
+            winner=match.winner.id,
+            score=self.score_to_dict(match.score),
+        )
+
     def get_match_by_uuid(self, uuid: UUID) -> Match:
         stmt = select(MatchORM).where(MatchORM.uuid == uuid)
         match = self.session.scalars(stmt).one()
         return self.match_to_model(match)
+
+    def create_player(self, name: str):
+        player_orm = PlayerORM(name=name)
+        self.session.add(player_orm)
+
+    def create_match(self, match: Match):
+        match_orm = self.match_to_orm(match)
+        self.session.add(match_orm)

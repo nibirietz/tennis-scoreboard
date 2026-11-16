@@ -1,31 +1,38 @@
-from uuid import UUID, uuid4
+from uuid import UUID
 
-from sqlalchemy import ForeignKey, String, Uuid
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-
-class Base(DeclarativeBase):
-    pass
+from tennis_scoreboard.domain.models import Match, Player, Score
+from tennis_scoreboard.repository.orm_models import MatchORM, PlayerORM
 
 
-class Player(Base):
-    __tablename__ = "players"  # pyright: ignore[reportUnannotatedClassAttribute]
+class SQLAlchemyRepository:
+    def __init__(self, session: Session):
+        self.session: Session = session
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String(30), index=True)
+    def player_to_model(self, player: PlayerORM) -> Player:
+        return Player(
+            id=player.id,
+            name=player.name,
+        )
 
+    def score_to_model(self, score: dict[str, list[int]]):
+        return Score(
+            score["game_points"],
+            score["set_games"],
+            score["match_sets"],
+        )
 
-class Match(Base):
-    __tablename__ = "matches"  # pyright: ignore[reportUnannotatedClassAttribute]
+    def match_to_model(self, match: MatchORM) -> Match:
+        return Match(
+            uuid=match.uuid,
+            player1=self.player_to_model(match.player1),
+            player2=self.player_to_model(match.player2),
+            score=self.score_to_model(match.score),
+        )
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    uuid: Mapped[UUID] = mapped_column(Uuid, default=uuid4)
-    player1_id: Mapped[int] = mapped_column(ForeignKey("players.id"))
-    player2_id: Mapped[int] = mapped_column(ForeignKey("players.id"))
-    winner_id: Mapped[int | None] = mapped_column(ForeignKey("players.id"))
-    score: Mapped[dict[str, list[int]]] = mapped_column(JSONB)
-
-    player1: Mapped[Player] = relationship(foreign_keys=[player1_id])
-    player2: Mapped[Player] = relationship(foreign_keys=[player2_id])
-    winner: Mapped[Player | None] = relationship(foreign_keys=[winner_id])
+    def get_match_by_uuid(self, uuid: UUID) -> Match:
+        stmt = select(MatchORM).where(MatchORM.uuid == uuid)
+        match = self.session.scalars(stmt).one()
+        return self.match_to_model(match)

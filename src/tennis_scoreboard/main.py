@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from waitress import serve
 
 from tennis_scoreboard.server import application
+from wsgi import Application, Router
 
 
 def main(application, server_port):
@@ -13,5 +14,11 @@ def main(application, server_port):
 if __name__ == "__main__":
     load_dotenv()
     server_port = os.getenv("BACKEND_PORT")
-    app = application
+    router = Router()
+    app = Application(router)
+
+    @app.router.get("/")
+    def home():
+        return b"Hello, World!"
+    
     main(app, server_port)

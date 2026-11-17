@@ -17,8 +17,13 @@ if __name__ == "__main__":
     router = Router()
     app = Application(router)
 
-    @app.router.get("/")
+    @router.get("/")
     def home():
         return b"Hello, World!"
+
+
+    @router.get("/test")
+    def test(a: str):
+        return a.encode()
     
     main(app, server_port)

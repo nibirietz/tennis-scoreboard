@@ -17,7 +17,6 @@ class Router:
 
     def add_route(self, func: Callable[F_Spec, bytes], method: str, route: str):
         self.routes.append(APIRoute(route, method, func))
-        print("Add!")
 
     def get(self, route: str):
         def wrapper(func: Callable[F_Spec, bytes]) -> Callable[F_Spec, bytes]:
@@ -40,8 +39,8 @@ class Router:
 
         return wrapper
 
-    def handle(self, path: str, method: str) -> bytes:
+    def handle(self, path: str, method: str, *args, **kwargs) -> bytes:
         for route in self.routes:
             if route.path == path and route.method == method:
-                return route.func()
+                return route.func(*args, **kwargs)
         return b"Not founded"

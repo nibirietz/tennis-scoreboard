@@ -25,5 +25,9 @@ if __name__ == "__main__":
     @router.get("/test")
     def test(a: str):
         return a.encode()
+
+    @router.get("/tests")
+    def tests(b: list[str]):
+        return b
     
     main(app, server_port)

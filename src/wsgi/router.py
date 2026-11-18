@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from typing import ParamSpec, TypeVar
+from typing import ParamSpec, get_origin, get_type_hints
 
 F_Spec = ParamSpec("F_Spec")
 
@@ -39,8 +39,18 @@ class Router:
 
         return wrapper
 
+    def parse_kwargs(self, func: Callable[F_Spec, bytes], **kwargs: list) -> dict:
+        hints = get_type_hints(func)
+        for key, value in kwargs.items():
+            key_type = hints.get(key, None)
+            if not get_origin(key_type) is list and len(value) == 1:
+                kwargs[key] = kwargs[key][0]
+        return kwargs
+                
+
     def handle(self, path: str, method: str, *args, **kwargs) -> bytes:
         for route in self.routes:
             if route.path == path and route.method == method:
-                return route.func(*args, **kwargs)
+                params = self.parse_kwargs(route.func, **kwargs)
+                return route.func(*args, **params)
         return b"Not founded"

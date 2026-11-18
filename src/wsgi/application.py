@@ -1,4 +1,5 @@
 from collections.abc import Callable, Iterable
+import json
 from urllib.parse import parse_qs, urlparse
 
 from wsgi.router import Router
@@ -9,11 +10,9 @@ class Application:
         self.router: Router = router
 
 
-    def parse_query(self, environ: dict[str, object]) -> dict[str, object]:
+    def parse_query(self, environ: dict[str, object]) -> dict[str, list[object]]:
         raw_query_params: dict[str, list[object]] = parse_qs(environ.get("QUERY_STRING", ""))
-        return {
-            name: param if len(param) != 1 else param[0] for name, param in raw_query_params.items()
-        }
+        return raw_query_params
     
 
     def __call__(
@@ -25,8 +24,10 @@ class Application:
         method: str = environ.get("REQUEST_METHOD", "")
         query_params = self.parse_query(environ)
         result = self.router.handle(path, method, **query_params)
+        print(result)
+        result = json.dumps(result).encode("utf-8")
         _ = start_response("200 OK", [("Content-type", "text/plain; charset=utf-8")])
-        yield result
+        return [result]
 
 
 if __name__ == "__main__":

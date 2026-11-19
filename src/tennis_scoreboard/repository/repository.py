@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from tennis_scoreboard.domain.models import Match, Player, Score, Side
@@ -47,7 +47,7 @@ class SQLAlchemyRepository:
             uuid=match.uuid,
             player1_id=match.player1.id,
             player2_id=match.player2.id,
-            winner=match.winner if match.winner is not None else None,
+            winner_id=match.winner.id if match.winner is not None else None,
             score=self.score_to_dict(match.score),
         )
 
@@ -71,3 +71,13 @@ class SQLAlchemyRepository:
     def create_match(self, match: Match):
         match_orm = self.match_to_orm(match)
         self.session.add(match_orm)
+        self.session.flush()
+        return match
+
+    def update_match_score(self, match: Match) -> Match:
+        stmt = select(MatchORM).where(MatchORM.uuid == match.uuid)
+        match_orm = self.session.scalars(stmt).one()
+        match_orm.score = self.score_to_dict(match.score)
+        self.session.flush()
+        return match
+        

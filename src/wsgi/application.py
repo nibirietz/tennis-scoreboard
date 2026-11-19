@@ -77,7 +77,8 @@ class Application:
             content_length = int(environ.get("CONTENT_LENGTH", 0))
             post_body = environ.get("wsgi.input", "").read(content_length).decode("utf-8")
             form_data = parse_qs(post_body)
-            result = self.router.handle(path, method, **form_data, **query_params)
+            params = query_params | form_data
+            result = self.router.handle(path, method, **params)
             return self.send_response(
                 start_response, result.body, result.headers, result.status
             )

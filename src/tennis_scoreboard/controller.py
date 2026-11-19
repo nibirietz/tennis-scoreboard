@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 from jinja2 import Environment
 
 from tennis_scoreboard.domain.match_service import MatchService
+from tennis_scoreboard.domain.models import Side
 from tennis_scoreboard.exceptions import IdenticalPlayers
 from wsgi import Router
 from wsgi.response import HTMLResponse, RedirectResponse
@@ -41,9 +42,22 @@ def register_routers(router: Router, service: MatchService, templates: Environme
 
     @router.get("/match")
     def match_score(uuid: str):
-        template = templates.get_template("match-score.html")
         match = service.get_match(UUID(uuid))
-        html = template.render(match=match)
+        template = templates.get_template("match-score.html")
+        html = template.render(match=match, uuid=uuid)
         body = html.encode("utf-8")
         response = HTMLResponse(body, "200 OK")
         return response
+
+
+    @router.post("/match")
+    def add_point(uuid: str, player_number: str):
+        player_number: int | None = int(player_number) if player_number.isdigit() else None
+        if player_number == 1:
+            player_side = Side.FIRST
+        elif player_number == 2:
+            player_side = Side.SECOND
+        else:
+            return RedirectResponse(f"/match?uuid={uuid}")
+        match = service.add_point(UUID(uuid), player_side)
+        return RedirectResponse(f"/match?uuid={uuid}")

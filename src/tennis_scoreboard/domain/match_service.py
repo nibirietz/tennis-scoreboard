@@ -5,8 +5,8 @@ from uuid import UUID
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from tennis_scoreboard.domain.models import Match
-from tennis_scoreboard.exceptions import MatchAlreadyExists
+from tennis_scoreboard.domain.models import Match, Side
+from tennis_scoreboard.exceptions import MatchAlreadyExists, MatchUnknownPlayer
 from tennis_scoreboard.mapper import MatchMapper
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
 
@@ -29,7 +29,6 @@ class MatchService:
                     player2 = repository.create_player(player2_name)
                 match = Match.new(uuid, player1, player2)
                 repository.create_match(match)
-                session.commit()
         except IntegrityError:
             raise MatchAlreadyExists("Матч уже существует.")
 
@@ -37,4 +36,16 @@ class MatchService:
         with self.session_factory() as session:
             repository = SQLAlchemyRepository(session)
             match = repository.get_match_by_uuid(uuid)
+            return MatchMapper.match_to_response(match)
+
+    def add_point(self, uuid: UUID, player_side: Side):
+        with self.session_factory() as session:
+            repository = SQLAlchemyRepository(session)
+            match = repository.get_match_by_uuid(uuid)
+            if player_side == Side.FIRST:
+                player = match.player1
+            elif player_side == Side.SECOND:
+                player = match.player2
+            match.add_point(player)
+            match = repository.update_match_score(match)
             return MatchMapper.match_to_response(match)

@@ -47,7 +47,6 @@ if __name__ == "__main__":
 
     @router.post("/new-match")
     def new_match(player1_name: str, player2_name: str):
-        print(player1_name, player2_name)
         return Response("", "302 Found", "")
 
     main(app, server_port)

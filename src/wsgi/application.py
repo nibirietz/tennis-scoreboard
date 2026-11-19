@@ -22,16 +22,12 @@ class Application:
         self,
         start_response,
         body: bytes,
-        content_type: str = "text/html; charset=utf-8",
+        headers: list[tuple[str, str]],
         status: str = "200 OK",
     ) -> Iterable[bytes]:
-        start_response(
-            status,
-            [
-                ("Content-Type", content_type),
-                ("Content-Length", str(len(body))),
-            ],
-        )
+        if body != b"":
+            headers.append(("Content-Length", str(len(body))))
+        start_response(status, headers)
         return [body]
 
     def serve_static(self, path: str, start_response) -> Iterable[bytes]:
@@ -75,13 +71,17 @@ class Application:
             else:
                 result = self.router.handle(path, method, **query_params)
                 return self.send_response(
-                    start_response, result.body, result.content_type, result.status
+                    start_response, result.body, result.headers, result.status
                 )
         if method == "POST":
-            content_length = int(environ.get('CONTENT_LENGTH', 0))
-            post_body = environ["wsgi.input"].read(content_length).decode("utf-8")
+            content_length = int(environ.get("CONTENT_LENGTH", 0))
+            post_body = environ.get("wsgi.input", "").read(content_length).decode("utf-8")
             form_data = parse_qs(post_body)
             result = self.router.handle(path, method, **form_data, **query_params)
+            return self.send_response(
+                start_response, result.body, result.headers, result.status
+            )
+
 
 if __name__ == "__main__":
     router = Router()

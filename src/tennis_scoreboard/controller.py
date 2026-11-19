@@ -1,5 +1,4 @@
-
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from jinja2 import Environment
 
@@ -13,7 +12,6 @@ def register_routers(router: Router, service: MatchService, templates: Environme
     @router.get("/")
     def main_page():
         template = templates.get_template("index.html")
-
         html = template.render()
         body = html.encode("utf-8")
         response = HTMLResponse(body, "200 OK")
@@ -44,7 +42,8 @@ def register_routers(router: Router, service: MatchService, templates: Environme
     @router.get("/match")
     def match_score(uuid: str):
         template = templates.get_template("match-score.html")
-        html = template.render()
+        match = service.get_match(UUID(uuid))
+        html = template.render(match=match)
         body = html.encode("utf-8")
         response = HTMLResponse(body, "200 OK")
         return response

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from tennis_scoreboard.domain.models import Match
 from tennis_scoreboard.exceptions import MatchAlreadyExists
+from tennis_scoreboard.mapper import MatchMapper
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
 
 SessionFactory = Callable[[], AbstractContextManager[Session]]
@@ -35,4 +36,5 @@ class MatchService:
     def get_match(self, uuid: UUID):
         with self.session_factory() as session:
             repository = SQLAlchemyRepository(session)
-            return repository.get_match_by_uuid(uuid)
+            match = repository.get_match_by_uuid(uuid)
+            return MatchMapper.match_to_response(match)

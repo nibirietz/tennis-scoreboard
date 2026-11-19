@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 from waitress import serve
 
 from tennis_scoreboard.server import application
-from wsgi import Application, Router
+from wsgi import Application, Response, Router
+from wsgi.response import HTMLResponse
 
 
 def main(application, server_port):
@@ -19,14 +20,17 @@ if __name__ == "__main__":
 
     @router.get("/")
     def home():
-        return b"Hello, World!"
+        body = "<h1>Hello, World!</h1>"
+        response = HTMLResponse(body, "200 OK")
+        return response
 
     @router.get("/test")
     def test(a: str):
-        return a.encode()
+        response = Response(a, "200 OK", "json")
+        return response
 
     @router.get("/tests")
     def tests(b: list[str]):
-        return b
+        return Response(b, "200 OK", "json")
 
     main(app, server_port)

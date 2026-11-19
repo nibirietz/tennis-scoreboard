@@ -24,10 +24,8 @@ class Application:
         method: str = environ.get("REQUEST_METHOD", "")
         query_params = self.parse_query(environ)
         result = self.router.handle(path, method, **query_params)
-        print(result)
-        result = json.dumps(result).encode("utf-8")
-        _ = start_response("200 OK", [("Content-type", "text/plain; charset=utf-8")])
-        return [result]
+        _ = start_response(result.status, [("Content-type", result.content_type)])
+        return [result.body]
 
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from waitress import serve
 
 from tennis_scoreboard.domain.match_service import MatchService
+from tennis_scoreboard.exceptions import IdenticalPlayers
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
 from tennis_scoreboard.server import application
 from wsgi import Application, Response, Router
@@ -32,7 +33,6 @@ if __name__ == "__main__":
     server_port = getenv("BACKEND_PORT")
     router = Router()
     app = Application(router, BASE_DIR / "static", BASE_DIR / "templates")
-    
 
     db_url = URL.create(
         drivername="postgresql+psycopg",
@@ -53,9 +53,7 @@ if __name__ == "__main__":
         finally:
             session.close()
 
-
     service = MatchService(get_session)
-
 
     @router.get("/")
     def main_page():
@@ -78,7 +76,16 @@ if __name__ == "__main__":
     @router.post("/new-match")
     def new_match(player1_name: str, player2_name: str):
         uuid = uuid4()
-        service.new_match(player1_name, player2_name, uuid)
+        try:
+            service.new_match(uuid, player1_name, player2_name)
+        except IdenticalPlayers:
+            print("Одинаковые игроки.")
+            template = templates.get_template("new-match.html")
+
+            html = template.render()
+            body = html.encode("utf-8")
+            response = HTMLResponse(body, "409 OK")
+            return response
         return RedirectResponse(f"/match?uuid={uuid}")
 
     @router.get("/match")

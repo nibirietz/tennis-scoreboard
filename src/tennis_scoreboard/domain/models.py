@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from uuid import UUID
 
-from tennis_scoreboard.exceptions import MatchUnknownPlayer
+from tennis_scoreboard.exceptions import IdenticalPlayers, MatchUnknownPlayer
 
 
 class Side(IntEnum):
@@ -105,6 +105,8 @@ class Match:
 
     @classmethod
     def new(cls, uuid: UUID, player1: Player, player2: Player) -> Match:
+        if player1 == player2:
+            raise IdenticalPlayers("Игрок не может играть сам с собой.")
         return cls(uuid=uuid, player1=player1, player2=player2, score=Score.new())
 
     @property

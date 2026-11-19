@@ -4,3 +4,7 @@ class MatchUnknownPlayer(Exception):
 
 class IdenticalPlayers(Exception):
     pass
+
+
+class MatchAlreadyExists(Exception):
+    pass

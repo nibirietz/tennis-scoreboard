@@ -42,6 +42,7 @@ if __name__ == "__main__":
         port=int(getenv("DB_PORT", 5432)),
         database=getenv("POSTGRES_DB"),
     )
+
     engine = create_engine(db_url)
     SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
@@ -50,6 +51,10 @@ if __name__ == "__main__":
         session: Session = SessionLocal()
         try:
             yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
         finally:
             session.close()
 
@@ -67,7 +72,6 @@ if __name__ == "__main__":
     @router.get("/new-match")
     def match():
         template = templates.get_template("new-match.html")
-
         html = template.render()
         body = html.encode("utf-8")
         response = HTMLResponse(body, "200 OK")
@@ -79,21 +83,17 @@ if __name__ == "__main__":
         try:
             service.new_match(uuid, player1_name, player2_name)
         except IdenticalPlayers:
-            print("Одинаковые игроки.")
             template = templates.get_template("new-match.html")
-
             html = template.render()
             body = html.encode("utf-8")
-            response = HTMLResponse(body, "409 OK")
+            response = HTMLResponse(body, "409 Conflict")
             return response
+
         return RedirectResponse(f"/match?uuid={uuid}")
 
     @router.get("/match")
     def match_score(uuid: str):
         template = templates.get_template("match-score.html")
-
-        print(service.get_match(UUID(uuid)))
-
         html = template.render()
         body = html.encode("utf-8")
         response = HTMLResponse(body, "200 OK")

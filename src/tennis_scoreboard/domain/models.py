@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import IntEnum
+from typing import override
 from uuid import UUID
 
 from tennis_scoreboard.exceptions import IdenticalPlayers, MatchUnknownPlayer
@@ -20,6 +21,11 @@ class Side(IntEnum):
 class Player:
     id: int
     name: str
+
+
+    @override
+    def __eq__(self, other: Player) -> bool:
+        return self.name == other.name
 
 
 @dataclass
@@ -106,7 +112,7 @@ class Match:
     @classmethod
     def new(cls, uuid: UUID, player1: Player, player2: Player) -> Match:
         if player1 == player2:
-            raise IdenticalPlayers("Игрок не может играть сам с собой.")
+            raise IdenticalPlayers
         return cls(uuid=uuid, player1=player1, player2=player2, score=Score.new())
 
     @property

@@ -1,7 +1,8 @@
 from collections.abc import Callable
-from typing import ParamSpec, get_origin, get_type_hints
+from typing import ParamSpec, TypeVar, get_origin, get_type_hints
 
 F_Spec = ParamSpec("F_Spec")
+F_Return = TypeVar("F_Return")
 
 
 class APIRoute:
@@ -19,21 +20,21 @@ class Router:
         self.routes.append(APIRoute(route, method, func))
 
     def get(self, route: str):
-        def wrapper(func: Callable[F_Spec, object]) -> Callable[F_Spec, object]:
+        def wrapper(func: Callable[F_Spec, F_Return]) -> Callable[F_Spec, F_Return]:
             self.add_route(func, "GET", route)
             return func
 
         return wrapper
 
     def post(self, route: str):
-        def wrapper(func: Callable[F_Spec, object]) -> Callable[F_Spec, object]:
+        def wrapper(func: Callable[F_Spec, F_Return]) -> Callable[F_Spec, F_Return]:
             self.add_route(func, "POST", route)
             return func
 
         return wrapper
 
     def patch(self, route: str):
-        def wrapper(func: Callable[F_Spec, object]) -> Callable[F_Spec, object]:
+        def wrapper(func: Callable[F_Spec, F_Return]) -> Callable[F_Spec, F_Return]:
             self.add_route(func, "PATCH", route)
             return func
 
@@ -52,4 +53,4 @@ class Router:
             if route.path == path and route.method == method:
                 params = self.parse_kwargs(route.func, **kwargs)
                 return route.func(*args, **params)
-        return b"Not founded"
+        return "Not founded"

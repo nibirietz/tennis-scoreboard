@@ -1,4 +1,4 @@
-import os
+from os import getenv
 
 from dotenv import load_dotenv
 from waitress import serve
@@ -13,14 +13,13 @@ def main(application, server_port):
 
 if __name__ == "__main__":
     load_dotenv()
-    server_port = os.getenv("BACKEND_PORT")
+    server_port = getenv("BACKEND_PORT")
     router = Router()
     app = Application(router)
 
     @router.get("/")
     def home():
         return b"Hello, World!"
-
 
     @router.get("/test")
     def test(a: str):
@@ -29,5 +28,5 @@ if __name__ == "__main__":
     @router.get("/tests")
     def tests(b: list[str]):
         return b
-    
+
     main(app, server_port)

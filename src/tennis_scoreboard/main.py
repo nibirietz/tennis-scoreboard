@@ -7,7 +7,7 @@ from waitress import serve
 
 from tennis_scoreboard.server import application
 from wsgi import Application, Response, Router
-from wsgi.response import HTMLResponse
+from wsgi.response import HTMLResponse, RedirectResponse
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
         return response
 
     @router.get("/new-match")
-    def new_match():
+    def match():
         template = templates.get_template("new-match.html")
 
         html = template.render()
@@ -47,6 +47,15 @@ if __name__ == "__main__":
 
     @router.post("/new-match")
     def new_match(player1_name: str, player2_name: str):
-        return Response("", "302 Found", "")
+        return RedirectResponse("/match")
+
+    @router.get("/match")
+    def match_score():
+        template = templates.get_template("match-score.html")
+
+        html = template.render()
+        body = html.encode("utf-8")
+        response = HTMLResponse(body, "200 OK")
+        return response
 
     main(app, server_port)

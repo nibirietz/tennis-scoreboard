@@ -28,4 +28,4 @@ class HTMLResponse(Response):
 
 class RedirectResponse(Response):
     def __init__(self, path: str):
-        super().__init__(None, "302 Founded", None, [("local", path)])
+        super().__init__(None, "302 Founded", None, [("Location", path)])

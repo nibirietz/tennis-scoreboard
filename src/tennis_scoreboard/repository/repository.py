@@ -47,7 +47,7 @@ class SQLAlchemyRepository:
             uuid=match.uuid,
             player1_id=match.player1.id,
             player2_id=match.player2.id,
-            winner=match.winner.id,
+            winner=match.winner if match.winner is not None else None,
             score=self.score_to_dict(match.score),
         )
 
@@ -56,9 +56,17 @@ class SQLAlchemyRepository:
         match = self.session.scalars(stmt).one()
         return self.match_to_model(match)
 
+    def get_player(self, name: str) -> Player | None:
+        stmt = select(PlayerORM).where(PlayerORM.name == name)
+        player = self.session.scalars(stmt).one_or_none()
+        if player:
+            return self.player_to_model(player)
+
     def create_player(self, name: str):
         player_orm = PlayerORM(name=name)
         self.session.add(player_orm)
+        self.session.flush()
+        return self.player_to_model(player_orm)
 
     def create_match(self, match: Match):
         match_orm = self.match_to_orm(match)

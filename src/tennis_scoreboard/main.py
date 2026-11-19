@@ -9,6 +9,7 @@ from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from waitress import serve
 
+from tennis_scoreboard.controller import register_routers
 from tennis_scoreboard.domain.match_service import MatchService
 from tennis_scoreboard.exceptions import IdenticalPlayers
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
@@ -32,7 +33,6 @@ if __name__ == "__main__":
     load_dotenv()
     server_port = getenv("BACKEND_PORT")
     router = Router()
-    app = Application(router, BASE_DIR / "static", BASE_DIR / "templates")
 
     db_url = URL.create(
         drivername="postgresql+psycopg",
@@ -59,44 +59,7 @@ if __name__ == "__main__":
             session.close()
 
     service = MatchService(get_session)
-
-    @router.get("/")
-    def main_page():
-        template = templates.get_template("index.html")
-
-        html = template.render()
-        body = html.encode("utf-8")
-        response = HTMLResponse(body, "200 OK")
-        return response
-
-    @router.get("/new-match")
-    def match():
-        template = templates.get_template("new-match.html")
-        html = template.render()
-        body = html.encode("utf-8")
-        response = HTMLResponse(body, "200 OK")
-        return response
-
-    @router.post("/new-match")
-    def new_match(player1_name: str, player2_name: str):
-        uuid = uuid4()
-        try:
-            service.new_match(uuid, player1_name, player2_name)
-        except IdenticalPlayers:
-            template = templates.get_template("new-match.html")
-            html = template.render()
-            body = html.encode("utf-8")
-            response = HTMLResponse(body, "409 Conflict")
-            return response
-
-        return RedirectResponse(f"/match?uuid={uuid}")
-
-    @router.get("/match")
-    def match_score(uuid: str):
-        template = templates.get_template("match-score.html")
-        html = template.render()
-        body = html.encode("utf-8")
-        response = HTMLResponse(body, "200 OK")
-        return response
+    register_routers(router, service, templates)
+    app = Application(router, BASE_DIR / "static", BASE_DIR / "templates")
 
     main(app, server_port)

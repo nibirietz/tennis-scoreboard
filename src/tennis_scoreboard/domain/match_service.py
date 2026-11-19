@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from tennis_scoreboard.domain.models import Match
-from tennis_scoreboard.exceptions import IdenticalPlayers, MatchAlreadyExists
+from tennis_scoreboard.exceptions import MatchAlreadyExists
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
 
 SessionFactory = Callable[[], AbstractContextManager[Session]]

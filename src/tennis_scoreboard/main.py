@@ -28,7 +28,7 @@ if __name__ == "__main__":
     app = Application(router, BASE_DIR / "static", BASE_DIR / "templates")
 
     @router.get("/")
-    def home():
+    def main_page():
         template = templates.get_template("index.html")
 
         html = template.render()
@@ -36,13 +36,18 @@ if __name__ == "__main__":
         response = HTMLResponse(body, "200 OK")
         return response
 
-    @router.get("/test")
-    def test(a: str):
-        response = Response(a, "200 OK", "json")
+    @router.get("/new-match")
+    def new_match():
+        template = templates.get_template("new-match.html")
+
+        html = template.render()
+        body = html.encode("utf-8")
+        response = HTMLResponse(body, "200 OK")
         return response
 
-    @router.get("/tests")
-    def tests(b: list[str]):
-        return Response(b, "200 OK", "json")
+    @router.post("/new-match")
+    def new_match(player1_name: str, player2_name: str):
+        print(player1_name, player2_name)
+        return Response("", "302 Found", "")
 
     main(app, server_port)

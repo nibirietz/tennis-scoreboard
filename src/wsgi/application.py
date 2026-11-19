@@ -68,16 +68,20 @@ class Application:
         path: str = environ.get("PATH_INFO", "")
         method: str = environ.get("REQUEST_METHOD", "")
         query_params = self.parse_query(environ)
-        if "/static/" in path:
-            body = self.serve_static(path, start_response)
-            print(body)
-            return body
-        else:
-            result = self.router.handle(path, method, **query_params)
-            return self.send_response(
-                start_response, result.body, result.content_type, result.status
-            )
-
+        if method == "GET":
+            if "/static/" in path:
+                body = self.serve_static(path, start_response)
+                return body
+            else:
+                result = self.router.handle(path, method, **query_params)
+                return self.send_response(
+                    start_response, result.body, result.content_type, result.status
+                )
+        if method == "POST":
+            content_length = int(environ.get('CONTENT_LENGTH', 0))
+            post_body = environ["wsgi.input"].read(content_length).decode("utf-8")
+            form_data = parse_qs(post_body)
+            result = self.router.handle(path, method, **form_data, **query_params)
 
 if __name__ == "__main__":
     router = Router()

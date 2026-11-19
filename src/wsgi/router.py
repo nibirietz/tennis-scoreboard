@@ -49,8 +49,9 @@ class Router:
         return kwargs
 
     def handle(self, path: str, method: str, *args, **kwargs) -> Response:
+        print(path, method)
         for route in self.routes:
             if route.path == path and route.method == method:
                 params = self.parse_kwargs(route.func, **kwargs)
                 return route.func(*args, **params)
-        return "Not founded"
+        return Response("Not Founded", "404 Not Founded", "text/plain; charset=utf-8")

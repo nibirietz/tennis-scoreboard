@@ -37,7 +37,7 @@ dev = [
 
 
 [tool.basedpyright]
-include = ["src", "test"]
+include = ["src", "tests"]
 
 
 [tool.pytest]

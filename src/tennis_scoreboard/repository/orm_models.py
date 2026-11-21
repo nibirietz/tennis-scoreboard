@@ -1,4 +1,4 @@
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, Uuid
 from sqlalchemy.dialects.postgresql import JSONB

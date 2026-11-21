@@ -1,9 +1,10 @@
 from collections.abc import Callable
-from typing import ParamSpec, TypeVar, get_origin, get_type_hints
+from typing import ParamSpec, get_origin, get_type_hints
 
 from wsgi.response import Response
 
 F_Spec = ParamSpec("F_Spec")
+
 
 class APIRoute:
     def __init__(self, path: str, method: str, func: Callable[F_Spec, Response]):

@@ -14,7 +14,6 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         template = templates.get_template(template_name)
         return template.render(**kwargs)
 
-        
     @router.get("/")
     def main_page():
         template = templates.get_template("index.html")
@@ -54,10 +53,11 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         response = HTMLResponse(body, "200 OK")
         return response
 
-
     @router.post("/match")
     def add_point(uuid: str, player_number: str):
-        player_number: int | None = int(player_number) if player_number.isdigit() else None
+        player_number: int | None = (
+            int(player_number) if player_number.isdigit() else None
+        )
         if player_number == 1:
             player_side = Side.FIRST
         elif player_number == 2:
@@ -65,6 +65,8 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         else:
             return RedirectResponse(f"/match?uuid={uuid}")
         match = service.add_point(UUID(uuid), player_side)
-        body = render_template("match-score.html", match=match, uuid=uuid).encode("utf-8")
+        body = render_template("match-score.html", match=match, uuid=uuid).encode(
+            "utf-8"
+        )
         response = HTMLResponse(body, "201 OK")
         return response

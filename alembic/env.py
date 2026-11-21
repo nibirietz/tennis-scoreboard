@@ -34,7 +34,7 @@ db_url = URL.create(
     username=os.getenv("DB_USER"),
     password=os.getenv("DB_PASSWORD"),
     host=os.getenv("DB_HOST", "localhost"),
-    port=int(os.getenv("DB_PORT", 5432)),
+    port=int(os.getenv("DB_PORT", "5432")),
     database=os.getenv("POSTGRES_DB"),
 )
 config.set_main_option("sqlalchemy.url", db_url.render_as_string(hide_password=False))

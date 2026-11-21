@@ -1,7 +1,7 @@
 import mimetypes
 from collections.abc import Callable, Iterable
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs
 
 from wsgi.router import Router
 
@@ -75,7 +75,9 @@ class Application:
                 )
         if method == "POST":
             content_length = int(environ.get("CONTENT_LENGTH", 0))
-            post_body = environ.get("wsgi.input", "").read(content_length).decode("utf-8")
+            post_body = (
+                environ.get("wsgi.input", "").read(content_length).decode("utf-8")
+            )
             form_data = parse_qs(post_body)
             params = query_params | form_data
             result = self.router.handle(path, method, **params)

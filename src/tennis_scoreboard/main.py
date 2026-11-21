@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 from os import getenv
 from pathlib import Path
-from uuid import UUID, uuid4
 
 from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -11,11 +10,7 @@ from waitress import serve
 
 from tennis_scoreboard.controller import register_routers
 from tennis_scoreboard.domain.match_service import MatchService
-from tennis_scoreboard.exceptions import IdenticalPlayers
-from tennis_scoreboard.repository.repository import SQLAlchemyRepository
-from tennis_scoreboard.server import application
-from wsgi import Application, Response, Router
-from wsgi.response import HTMLResponse, RedirectResponse
+from wsgi import Application, Router
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -25,12 +20,12 @@ templates = Environment(
 )
 
 
-def main(application, server_port):
-    serve(application, host="0.0.0.0", port=server_port)
+def main(app, server_port):
+    serve(app, host="0.0.0.0", port=server_port)
 
 
 if __name__ == "__main__":
-    load_dotenv()
+    _ = load_dotenv()
     server_port = getenv("BACKEND_PORT")
     router = Router()
 
@@ -39,7 +34,7 @@ if __name__ == "__main__":
         username=getenv("DB_USER"),
         password=getenv("DB_PASSWORD"),
         host=getenv("DB_HOST", "localhost"),
-        port=int(getenv("DB_PORT", 5432)),
+        port=int(getenv("DB_PORT", "5432")),
         database=getenv("POSTGRES_DB"),
     )
 

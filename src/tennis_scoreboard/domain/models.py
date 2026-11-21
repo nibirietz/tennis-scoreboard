@@ -22,7 +22,6 @@ class Player:
     id: int
     name: str
 
-
     @override
     def __eq__(self, other: Player) -> bool:
         return self.name == other.name
@@ -124,7 +123,9 @@ class Match:
 
     @property
     def is_tie_break(self) -> bool:
-        return self.score.get_games(Side.FIRST) == self.score.get_games(Side.SECOND) == 6
+        return (
+            self.score.get_games(Side.FIRST) == self.score.get_games(Side.SECOND) == 6
+        )
 
     def add_point(self, player: Player):
         if player.id == self.player1.id:

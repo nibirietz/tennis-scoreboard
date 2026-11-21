@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from tennis_scoreboard.domain.models import Match, Side
-from tennis_scoreboard.exceptions import MatchAlreadyExists, MatchUnknownPlayer
+from tennis_scoreboard.exceptions import MatchAlreadyExists
 from tennis_scoreboard.mapper import MatchMapper
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
 

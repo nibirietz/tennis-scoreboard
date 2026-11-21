@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from tennis_scoreboard.domain.models import Match, Player, Score, Side
@@ -80,4 +80,3 @@ class SQLAlchemyRepository:
         match_orm.score = self.score_to_dict(match.score)
         self.session.flush()
         return match
-        

@@ -89,7 +89,7 @@ class Score:
 
     def _is_winning_set(self, side: Side) -> bool:
         return (
-            self._set_games[side] == 6 and self._set_games[side.opponent] != 5
+            self._set_games[side] == 6 and self._set_games[side.opponent] < 5
         ) or self._set_games[side] == 7
 
     def _add_game(self, side: Side):
@@ -121,6 +121,10 @@ class Match:
             return self.player1
         if self.score.get_sets(Side.SECOND) == 2:
             return self.player2
+
+    @property
+    def is_tie_break(self) -> bool:
+        return self.score.get_games(Side.FIRST) == self.score.get_games(Side.SECOND) == 6
 
     def add_point(self, player: Player):
         if player.id == self.player1.id:

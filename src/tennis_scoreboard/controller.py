@@ -10,6 +10,11 @@ from wsgi.response import HTMLResponse, RedirectResponse
 
 
 def register_routers(router: Router, service: MatchService, templates: Environment):
+    def render_template(template_name: str, **kwargs) -> str:
+        template = templates.get_template(template_name)
+        return template.render(**kwargs)
+
+        
     @router.get("/")
     def main_page():
         template = templates.get_template("index.html")
@@ -60,4 +65,6 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         else:
             return RedirectResponse(f"/match?uuid={uuid}")
         match = service.add_point(UUID(uuid), player_side)
-        return RedirectResponse(f"/match?uuid={uuid}")
+        body = render_template("match-score.html", match=match, uuid=uuid).encode("utf-8")
+        response = HTMLResponse(body, "201 OK")
+        return response

@@ -3,12 +3,12 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class ScoreDTO:
-    player1_points: int
-    player2_points: int
-    player1_games: int
-    player2_games: int
-    player1_sets: int
-    player2_sets: int
+    player1_points: str
+    player2_points: str
+    player1_games: str
+    player2_games: str
+    player1_sets: str
+    player2_sets: str
 
 @dataclass(frozen=True)
 class MatchResponse:

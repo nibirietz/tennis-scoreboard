@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import select, update
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.sql import or_
 
 from tennis_scoreboard.domain.models import Match, Player, Score, Side
@@ -44,7 +44,6 @@ class SQLAlchemyRepository:
         }
 
     def match_to_orm(self, match: Match):
-        print(match.winner, match.winner.id if match.winner is not None else None)
         return MatchORM(
             uuid=match.uuid,
             player1_id=match.player1.id,
@@ -53,10 +52,16 @@ class SQLAlchemyRepository:
             score=self.score_to_dict(match.score),
         )
 
-    def get_match_by_uuid(self, uuid: UUID) -> Match:
-        stmt = select(MatchORM).where(MatchORM.uuid == uuid)
-        match = self.session.scalars(stmt).one()
-        return self.match_to_model(match)
+    def get_match_by_uuid(self, uuid: UUID) -> Match | None:
+        stmt = (
+            select(MatchORM)
+            .options(joinedload(MatchORM.player1), joinedload(MatchORM.player2))
+            .where(MatchORM.uuid == uuid)
+        )
+        match = self.session.scalar(stmt)
+        if match:
+            return self.match_to_model(match)
+
 
     def get_player(self, name: str) -> Player | None:
         stmt = select(PlayerORM).where(PlayerORM.name == name)
@@ -77,16 +82,27 @@ class SQLAlchemyRepository:
         return match
 
     def update_match_score(self, match: Match) -> Match:
-        stmt = select(MatchORM).where(MatchORM.uuid == match.uuid)
-        match_orm = self.session.scalars(stmt).one()
-        match_orm.score = self.score_to_dict(match.score)
-        match_orm.winner_id = match.winner.id if match.winner is not None else None
+        stmt = (
+            update(MatchORM)
+            .where(MatchORM.uuid == match.uuid)
+            .values(
+                score=self.score_to_dict(match.score),
+                winner_id=match.winner.id if match.winner is not None else None,
+            )
+        )
+        _ = self.session.execute(stmt)
         self.session.flush()
         return match
 
     def get_matches(self, page: int, filtered_by: str | None) -> list[Match]:
         stmt = (
-            select(MatchORM).order_by(MatchORM.id).where(MatchORM.winner_id.is_not(None))
+            select(MatchORM)
+            .order_by(MatchORM.id)
+            .where(MatchORM.winner_id.is_not(None))
+            .options(
+                joinedload(MatchORM.player1),
+                joinedload(MatchORM.player2),
+            )
         )
         if filtered_by:
             stmt = stmt.where(

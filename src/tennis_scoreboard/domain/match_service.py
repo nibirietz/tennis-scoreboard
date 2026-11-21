@@ -5,7 +5,6 @@ from uuid import UUID
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from tennis_scoreboard import repository
 from tennis_scoreboard.domain.models import Match, Side
 from tennis_scoreboard.exceptions import MatchAlreadyExists
 from tennis_scoreboard.mapper import MatchMapper
@@ -50,7 +49,6 @@ class MatchService:
             match.add_point(player)
             match = repository.update_match_score(match)
             return MatchMapper.match_to_response(match)
-
 
     def get_matches(self, page: int, filtered_by: str | None):
         with self.session_factory() as session:

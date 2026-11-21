@@ -24,7 +24,7 @@
         </div>
         <div>
             <nav class="nav-links">
-                <a class="nav-link" href="#">Home</a>
+                <a class="nav-link" href="/">Home</a>
                 <a class="nav-link" href="#">Matches</a>
             </nav>
         </div>
@@ -52,7 +52,7 @@
                     <td class="table-text">{{ match.score.player1_points }}</td>
                     <td class="table-text">
                         <form method="post" action="/match?uuid={{ uuid }}">
-                            <input class="form-button" type="submit" name="player_number" value=1>Score</input>
+                            <button class="form-button" type="submit" name="player_number" value="1">Score</button>
                         </form>
                     </td>
                 </tr>
@@ -63,7 +63,7 @@
                     <td class="table-text">{{ match.score.player2_points }}</td>
                     <td class="table-text">
                         <form method="post" action="/match?uuid={{ uuid }}">
-                            <input class="form-button" type="submit" name="player_number" value=2>Score</input>
+                            <button class="form-button" type="submit" name="player_number" value="2">Score</button>
                         </form>
                     </td>
                 </tr>

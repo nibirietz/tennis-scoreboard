@@ -28,7 +28,7 @@ class MatchService:
                 if player2 is None:
                     player2 = repository.create_player(player2_name)
                 match = Match.new(uuid, player1, player2)
-                repository.create_match(match)
+                _ = repository.create_match(match)
         except IntegrityError:
             raise MatchAlreadyExists("Матч уже существует.")
 

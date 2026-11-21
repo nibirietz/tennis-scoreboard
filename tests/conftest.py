@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import pytest
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import Session, sessionmaker
-from testcontainers.postgres import PostgresContainer
+from testcontainers.community.postgres import PostgresContainer
 
 from tennis_scoreboard.domain.match_service import MatchService, SessionFactory
 from tennis_scoreboard.repository.orm_models import Base
@@ -13,7 +13,7 @@ from tennis_scoreboard.repository.orm_models import Base
 @pytest.fixture(scope="session")
 def test_engine() -> Generator[Engine]:
     with PostgresContainer("postgres:16-alpine") as postgres:
-        engine: Engine = create_engine(postgres.get_connection_url())
+        engine: Engine = create_engine(postgres.get_connection_url().replace("psycopg2", "psycopg"))
         Base.metadata.create_all(engine)
         yield engine
         engine.dispose()
@@ -49,5 +49,5 @@ def get_session(db_session: Session) -> SessionFactory:
 
 
 @pytest.fixture(scope="function")
-def service(get_session: SessionFactory) -> MatchService:
+def match_service(get_session: SessionFactory) -> MatchService:
     return MatchService(get_session)

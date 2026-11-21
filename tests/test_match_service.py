@@ -1,53 +1,15 @@
-from collections.abc import Generator
-from contextlib import contextmanager
+from uuid import uuid4
 
-import pytest
-from sqlalchemy import Engine, create_engine
-from sqlalchemy.orm import Session, sessionmaker
-from testcontainers.postgres import PostgresContainer
-
-from tennis_scoreboard.domain.match_service import MatchService, SessionFactory
-from tennis_scoreboard.repository.orm_models import Base
+from tennis_scoreboard.domain.match_service import MatchService
 
 
-@pytest.fixture(scope="session")
-def test_engine() -> Generator[Engine]:
-    with PostgresContainer("postgres:16-alpine") as postgres:
-        engine: Engine = create_engine(postgres.get_connection_url())
-        Base.metadata.create_all(engine)
-        yield engine
-        engine.dispose()
+def test_create_new_match(match_service: MatchService):
+    uuid = uuid4()
+    player1_name = "Alex"
+    player2_name = "Michael"
+    match_service.new_match(uuid, player1_name, player2_name)
+    match = match_service.get_match(uuid)
+    assert match.player1_name == player1_name
+    assert match.player2_name == player2_name
 
-
-@pytest.fixture(scope="function")
-def db_session(test_engine: Engine) -> Generator[Session]:
-    connection = test_engine.connect()
-    transaction = connection.begin()
-    TestSessionLocal = sessionmaker(
-        bind=connection,
-        autoflush=False,
-        autocommit=False,
-        join_transaction_mode="create_savepoint",
-        expire_on_commit=False,
-    )
-    session: Session = TestSessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
-        transaction.rollback()
-        connection.close()
-
-
-@pytest.fixture(scope="function")
-def get_session(db_session: Session) -> SessionFactory:
-    @contextmanager
-    def _factory() -> Generator[Session]:
-        yield db_session
-
-    return _factory
-
-
-@pytest.fixture(scope="function")
-def service(get_session: SessionFactory) -> MatchService:
-    return MatchService(get_session)
+    

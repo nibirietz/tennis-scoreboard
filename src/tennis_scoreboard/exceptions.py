@@ -8,3 +8,7 @@ class IdenticalPlayers(Exception):
 
 class MatchAlreadyExists(Exception):
     pass
+
+
+class MatchNonExists(Exception):
+    pass

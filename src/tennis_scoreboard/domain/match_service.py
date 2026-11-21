@@ -6,7 +6,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from tennis_scoreboard.domain.models import Match, Side
-from tennis_scoreboard.exceptions import MatchAlreadyExists
+from tennis_scoreboard.dto import MatchResponse
+from tennis_scoreboard.exceptions import MatchAlreadyExists, MatchNonExists
 from tennis_scoreboard.mapper import MatchMapper
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
 
@@ -42,6 +43,8 @@ class MatchService:
         with self.session_factory() as session:
             repository = SQLAlchemyRepository(session)
             match = repository.get_match_by_uuid(uuid)
+            if not match:
+                raise MatchNonExists("Матч не существует.")
             if player_side == Side.FIRST:
                 player = match.player1
             elif player_side == Side.SECOND:
@@ -50,8 +53,8 @@ class MatchService:
             match = repository.update_match_score(match)
             return MatchMapper.match_to_response(match)
 
-    def get_matches(self, page: int, filtered_by: str | None):
+    def get_matches(self, page: int, filtered_by: str | None) -> list[MatchResponse]:
         with self.session_factory() as session:
             repository = SQLAlchemyRepository(session)
             matches = repository.get_matches(page, filtered_by)
-            print(matches)
+            return [MatchMapper.match_to_response(match) for match in matches]

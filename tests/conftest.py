@@ -43,7 +43,8 @@ def db_session(test_engine: Engine) -> Generator[Session]:
 def get_session(db_session: Session) -> SessionFactory:
     @contextmanager
     def _factory() -> Generator[Session]:
-        yield db_session
+        with db_session.begin_nested():
+            yield db_session
 
     return _factory
 

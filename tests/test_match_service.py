@@ -1,5 +1,5 @@
-from collections.abc import Callable, Generator
-from contextlib import AbstractContextManager, contextmanager
+from collections.abc import Generator
+from contextlib import contextmanager
 
 import pytest
 from sqlalchemy import Engine, create_engine
@@ -28,6 +28,7 @@ def db_session(test_engine: Engine) -> Generator[Session]:
         autoflush=False,
         autocommit=False,
         join_transaction_mode="create_savepoint",
+        expire_on_commit=False,
     )
     session: Session = TestSessionLocal()
     try:
@@ -48,5 +49,5 @@ def get_session(db_session: Session) -> SessionFactory:
 
 
 @pytest.fixture(scope="function")
-def service(get_session: SessionFactory):
+def service(get_session: SessionFactory) -> MatchService:
     return MatchService(get_session)

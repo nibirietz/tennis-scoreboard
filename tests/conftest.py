@@ -1,39 +1,53 @@
-from uuid import UUID, uuid4
+from collections.abc import Generator
+from contextlib import contextmanager
 
 import pytest
+from sqlalchemy import Engine, create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from testcontainers.postgres import PostgresContainer
 
-from tennis_scoreboard.domain.models import Match, Player, Score
-
-
-class FakeRepository:
-    def __init__(self):
-        self.players: list[Player] = [Player(1, "Alex"), Player(2, "Michael")]
-        self.matches: list[Match] = [
-            Match(
-                uuid=uuid4(),
-                player1=Player(1, "Alex"),
-                player2=Player(2, "Michael"),
-                winner=None,
-                score=Score.new(),
-            )
-        ]
-
-    def get_player_by_name(self, name: str) -> Player | None:
-        for player in self.players:
-            if player.name == name:
-                return player
-
-    def get_match_by_uuid(self, uuid: UUID) -> Match | None: ...
-
-    def add_match(self, match: Match): ...
-
-    def update_match(self, match: Match): ...
-
-    def add_player(self, name: str): ...
-
-    def get_player_by_id(self, id: int) -> Player: ...
+from tennis_scoreboard.domain.match_service import MatchService, SessionFactory
+from tennis_scoreboard.repository.orm_models import Base
 
 
-@pytest.fixture
-def repository() -> FakeRepository:
-    return FakeRepository()
+@pytest.fixture(scope="session")
+def test_engine() -> Generator[Engine]:
+    with PostgresContainer("postgres:16-alpine") as postgres:
+        engine: Engine = create_engine(postgres.get_connection_url())
+        Base.metadata.create_all(engine)
+        yield engine
+        engine.dispose()
+
+
+@pytest.fixture(scope="function")
+def db_session(test_engine: Engine) -> Generator[Session]:
+    connection = test_engine.connect()
+    transaction = connection.begin()
+    TestSessionLocal = sessionmaker(
+        bind=connection,
+        autoflush=False,
+        autocommit=False,
+        join_transaction_mode="create_savepoint",
+        expire_on_commit=False,
+    )
+    session: Session = TestSessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
+        transaction.rollback()
+        connection.close()
+
+
+@pytest.fixture(scope="function")
+def get_session(db_session: Session) -> SessionFactory:
+    @contextmanager
+    def _factory() -> Generator[Session]:
+        yield db_session
+
+    return _factory
+
+
+@pytest.fixture(scope="function")
+def service(get_session: SessionFactory) -> MatchService:
+    return MatchService(get_session)

@@ -66,12 +66,12 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         return response
 
     @router.get("/matches")
-    def get_matches(page: str = "1", filter_by_player: str | None = None):
+    def get_matches(page: str = "1", filter_by_player_name: str | None = None):
         if page.isdigit():
             page_ = int(page)
         else:
             page_ = 1
-        matches = service.get_matches(page_, filter_by_player)
+        matches = service.get_matches(page_, filter_by_player_name)
         html = render_template("matches.html", matches=matches)
         response = HTMLResponse(html, "200 OK")
         return response

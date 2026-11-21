@@ -853,6 +853,7 @@ dev = [
     { name = "pytest-cov" },
     { name = "ruff" },
     { name = "testcontainers" },
+    { name = "types-waitress" },
 ]
 
 [package.metadata]
@@ -874,6 +875,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=7.1.0" },
     { name = "ruff", specifier = ">=0.17.4" },
     { name = "testcontainers", extras = ["postgres"], specifier = ">=4.15.0" },
+    { name = "types-waitress", specifier = ">=3.0.1.20260724" },
 ]
 
 [[package]]
@@ -890,6 +892,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/4b/13/2cc466bddf26d0085f30a2b2bd56b7f8708b54a54db833eec97c5c69129b/testcontainers-4.15.0.tar.gz", hash = "sha256:085cde086337632e19002719460b7b80bbab2bdd51bb3ea04f77d0de96504706", size = 95340, upload-time = "2026-07-24T23:08:01.731Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/00/7e/424aac8b355597835deb333e757a0e94b5ccf38ad00f07fe6ed1f4e17c88/testcontainers-4.15.0-py3-none-any.whl", hash = "sha256:8796c14e76604031ad39cf0ed3b8e9806283a1fbf5270965c2b1c594caa31b74", size = 160771, upload-time = "2026-07-24T23:08:00.13Z" },
+]
+
+[[package]]
+name = "types-waitress"
+version = "3.0.1.20260724"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/79/87852f3ed81730ad64cdd16fe14dd664f7403aec9643c5a72d1bf36ec454/types_waitress-3.0.1.20260724.tar.gz", hash = "sha256:dc05abee59c067cf94edc273b19d38b2b9b456e544ead280b2edfefdc8851811", size = 14533, upload-time = "2026-07-24T04:57:51.05Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8f/76/9892eacf410bf177167257284afbe9fb565d98f8905e29246f31f57463c6/types_waitress-3.0.1.20260724-py3-none-any.whl", hash = "sha256:bcbeb4fd3d7e864e228c9bea01580acab0d9addb10ffc8d37b914a625a13fc34", size = 17499, upload-time = "2026-07-24T04:57:50.137Z" },
 ]
 
 [[package]]

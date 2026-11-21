@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import or_
 
 from tennis_scoreboard.domain.models import Match, Player, Score, Side
 from tennis_scoreboard.repository.orm_models import MatchORM, PlayerORM
@@ -43,6 +44,7 @@ class SQLAlchemyRepository:
         }
 
     def match_to_orm(self, match: Match):
+        print(match.winner, match.winner.id if match.winner is not None else None)
         return MatchORM(
             uuid=match.uuid,
             player1_id=match.player1.id,
@@ -78,5 +80,22 @@ class SQLAlchemyRepository:
         stmt = select(MatchORM).where(MatchORM.uuid == match.uuid)
         match_orm = self.session.scalars(stmt).one()
         match_orm.score = self.score_to_dict(match.score)
+        match_orm.winner_id = match.winner.id if match.winner is not None else None
         self.session.flush()
         return match
+
+    def get_matches(self, page: int, filtered_by: str | None) -> list[Match]:
+        stmt = (
+            select(MatchORM).order_by(MatchORM.id).where(MatchORM.winner_id.is_not(None))
+        )
+        if filtered_by:
+            stmt = stmt.where(
+                or_(
+                    MatchORM.player1.has(PlayerORM.name == filtered_by),
+                    MatchORM.player2.has(PlayerORM.name == filtered_by),
+                )
+            )
+        stmt = stmt.limit(5).offset((page - 1) * 5)
+        matches_orm = self.session.scalars(stmt).all()
+        matches = [self.match_to_model(match) for match in matches_orm]
+        return matches

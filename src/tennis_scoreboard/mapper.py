@@ -34,10 +34,10 @@ class MatchMapper:
         score = ScoreDTO(
             player1_points,
             player2_points,
-            match.score.get_games(Side.FIRST),
-            match.score.get_games(Side.SECOND),
-            match.score.get_sets(Side.FIRST),
-            match.score.get_sets(Side.SECOND),
+            str(match.score.get_games(Side.FIRST)),
+            str(match.score.get_games(Side.SECOND)),
+            str(match.score.get_sets(Side.FIRST)),
+            str(match.score.get_sets(Side.SECOND)),
         )
         return MatchResponse(
             match.player1.name,

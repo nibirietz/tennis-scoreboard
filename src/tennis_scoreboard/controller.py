@@ -64,3 +64,10 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         html = render_template("match-score.html", match=match, uuid=uuid)
         response = HTMLResponse(html, "201 OK")
         return response
+
+    @router.get("/matches")
+    def get_matches(page: str = "1", filter_by_player: str | None = None):
+        matches = service.get_matches(1, filter_by_player)
+        html = render_template("matches.html")
+        response = HTMLResponse(html, "200 OK")
+        return response

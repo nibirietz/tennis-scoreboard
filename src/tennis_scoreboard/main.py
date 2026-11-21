@@ -47,7 +47,7 @@ if __name__ == "__main__":
         try:
             yield session
             session.commit()
-        except Exception:
+        except Exception as e:
             session.rollback()
             raise
         finally:

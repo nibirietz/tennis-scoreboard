@@ -18,16 +18,14 @@ def register_routers(router: Router, service: MatchService, templates: Environme
     def main_page():
         template = templates.get_template("index.html")
         html = template.render()
-        body = html.encode("utf-8")
-        response = HTMLResponse(body, "200 OK")
+        response = HTMLResponse(html, "200 OK")
         return response
 
     @router.get("/new-match")
     def match():
         template = templates.get_template("new-match.html")
         html = template.render()
-        body = html.encode("utf-8")
-        response = HTMLResponse(body, "200 OK")
+        response = HTMLResponse(html, "200 OK")
         return response
 
     @router.post("/new-match")
@@ -35,11 +33,10 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         uuid = uuid4()
         try:
             service.new_match(uuid, player1_name, player2_name)
-        except IdenticalPlayers:
+        except IdenticalPlayers as e:
             template = templates.get_template("new-match.html")
-            html = template.render()
-            body = html.encode("utf-8")
-            response = HTMLResponse(body, "409 Conflict")
+            html = template.render(error=str(e))
+            response = HTMLResponse(html, "409 Conflict")
             return response
 
         return RedirectResponse(f"/match?uuid={uuid}")
@@ -49,8 +46,7 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         match = service.get_match(UUID(uuid))
         template = templates.get_template("match-score.html")
         html = template.render(match=match, uuid=uuid)
-        body = html.encode("utf-8")
-        response = HTMLResponse(body, "200 OK")
+        response = HTMLResponse(html, "200 OK")
         return response
 
     @router.post("/match")
@@ -65,8 +61,6 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         else:
             return RedirectResponse(f"/match?uuid={uuid}")
         match = service.add_point(UUID(uuid), player_side)
-        body = render_template("match-score.html", match=match, uuid=uuid).encode(
-            "utf-8"
-        )
-        response = HTMLResponse(body, "201 OK")
+        html = render_template("match-score.html", match=match, uuid=uuid)
+        response = HTMLResponse(html, "201 OK")
         return response

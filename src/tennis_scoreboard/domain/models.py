@@ -23,8 +23,11 @@ class Player:
     name: str
 
     @override
-    def __eq__(self, other: Player) -> bool:
-        return self.name == other.name
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, Player):
+            return self.name == other.name
+        else:
+            raise NotImplementedError
 
 
 @dataclass
@@ -111,7 +114,7 @@ class Match:
     @classmethod
     def new(cls, uuid: UUID, player1: Player, player2: Player) -> Match:
         if player1 == player2:
-            raise IdenticalPlayers
+            raise IdenticalPlayers("Нельзя играть с самим собой.")
         return cls(uuid=uuid, player1=player1, player2=player2, score=Score.new())
 
     @property

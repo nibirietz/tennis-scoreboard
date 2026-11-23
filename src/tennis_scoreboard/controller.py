@@ -63,8 +63,10 @@ def register_routers(router: Router, service: MatchService, templates: Environme
             player_side = Side.SECOND
         else:
             return RedirectResponse(f"/match?uuid={uuid}")
-        service.add_point(UUID(uuid), player_side)
-        response = RedirectResponse(f"/match?uuid={uuid}")
+        match = service.add_point(UUID(uuid), player_side)
+        is_active = service.match_is_active(UUID(uuid))
+        html = render_template("partial-match-score.html", match=match, uuid=uuid, is_active=is_active)
+        response = HTMLResponse(html, "200 OK")
         return response
 
     @router.get("/matches")

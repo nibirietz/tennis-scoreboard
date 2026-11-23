@@ -1,0 +1,52 @@
+<div id="score-container">
+    <table class="table">
+        <thead class="result">
+        <tr>
+            <th class="table-text">Player</th>
+            <th class="table-text">Sets</th>
+            <th class="table-text">Games</th>
+            <th class="table-text">Points</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="player1">
+            <td class="table-text">{{ match.player1_name }}</td>
+            <td class="table-text">{{ match.score.player1_sets }}</td>
+            <td class="table-text">{{ match.score.player1_games }}</td>
+            <td class="table-text">{{ match.score.player1_points }}</td>
+            {% if is_active %}
+            <td class="table-text">
+                <button class="form-button"
+                    hx-post="/match"
+                    hx-vals='{"uuid": "{{ uuid }}", "player_number": 1}'
+                    hx-target="#score-container"
+                    hx-swap="outerHTML">
+                    Score
+                </button>
+            </td>
+            {% endif %}
+        </tr>
+        <tr class="player2">
+            <td class="table-text">{{ match.player2_name }}</td>
+            <td class="table-text">{{ match.score.player2_sets }}</td>
+            <td class="table-text">{{ match.score.player2_games }}</td>
+            <td class="table-text">{{ match.score.player2_points }}</td>
+            {% if is_active %}
+            <td class="table-text">
+                <button class="form-button"
+                    hx-post="/match"
+                    hx-vals='{"uuid": "{{ uuid }}", "player_number": 2}'
+                    hx-target="#score-container"
+                    hx-swap="outerHTML">
+                    Score
+                </button>
+            </td>
+            {% endif %}
+        </tr>
+        </tbody>
+    </table>
+
+    {% if not is_active %}
+    <p style="text-align: center; margin-top: 20px;">{{ match.winner_name }} won!</p>
+    {% endif %}
+</div>

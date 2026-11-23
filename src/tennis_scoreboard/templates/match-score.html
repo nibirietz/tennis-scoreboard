@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
 
     <script src="/static/js/app.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 </head>
 <body>
 <header class="header">
@@ -35,49 +36,9 @@
         <h1>Current match</h1>
         <div class="current-match-image"></div>
         <section class="score">
-            <table class="table">
-                <thead class="result">
-                <tr>
-                    <th class="table-text">Player</th>
-                    <th class="table-text">Sets</th>
-                    <th class="table-text">Games</th>
-                    <th class="table-text">Points</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="player1">
-                    <td class="table-text">{{ match.player1_name }}</td>
-                    <td class="table-text">{{ match.score.player1_sets }}</td>
-                    <td class="table-text">{{ match.score.player1_games }}</td>
-                    <td class="table-text">{{ match.score.player1_points }}</td>
-                    {% if is_active %}
-                    <td class="table-text">
-                        <form method="post" action="/match?uuid={{ uuid }}">
-                            <button class="form-button" type="submit" name="player_number" value="1">Score</button>
-                        </form>
-                    </td>
-                    {% endif %}
-                </tr>
-                <tr class="player2">
-                    <td class="table-text">{{ match.player2_name }}</td>
-                    <td class="table-text">{{ match.score.player2_sets }}</td>
-                    <td class="table-text">{{ match.score.player2_games }}</td>
-                    <td class="table-text">{{ match.score.player2_points }}</td>
-                    {% if is_active %}
-                    <td class="table-text">
-                        <form method="post" action="/match?uuid={{ uuid }}">
-                            <button class="form-button" type="submit" name="player_number" value="2">Score</button>
-                        </form>
-                    </td>
-                    {% endif %}
-                </tr>
-                </tbody>
-            </table>
+            {% include "partial-match-score.html" %}
         </section>
     </div>
-    {% if not is_active %}
-    <p style="text-align: center;">{{ match.winner_name }} is win!</p>
-    {% endif %}
 </main>
 <footer>
     <div class="footer">

@@ -53,7 +53,7 @@ class MatchService:
                 return MatchMapper.match_to_response(match)
         return MatchMapper.match_to_response(match)
 
-    def add_point(self, uuid: UUID, player_side: Side):
+    def add_point(self, uuid: UUID, player_side: Side) -> MatchResponse:
         match = self.active_matches.get(uuid, None)
         if match is None:
             raise MatchNonExists("Match doesn't exist.")
@@ -68,7 +68,8 @@ class MatchService:
                 repository = SQLAlchemyRepository(session)
                 repository.update_match_score(match)
                 session.commit()
-                self.active_matches.pop(uuid)
+                match = self.active_matches.pop(uuid)
+        return MatchMapper.match_to_response(match)
 
     def get_matches(self, page: int, filtered_by: str | None) -> list[MatchResponse]:
         with self.session_factory() as session:

@@ -40,7 +40,7 @@ def test_add_point_failed_after_indetefication_winner():
 def test_add_point_unknown_player():
     match = Match.new(uuid4(), player1, player2)
     unknown_player = Player(3, "Joker")
-    with pytest.raises(MatchUnknownPlayer, match="Неизвестный участник матча."):
+    with pytest.raises(MatchUnknownPlayer, match="Unknown player."):
         match.add_point(unknown_player)
     assert match.score.get_points(Side.FIRST) == 0
     assert match.score.get_points(Side.SECOND) == 0

@@ -32,7 +32,7 @@ class MatchService:
                 repository.create_match(match)
                 session.commit()
         except IntegrityError:
-            raise MatchAlreadyExists("Матч уже существует.")
+            raise MatchAlreadyExists("Match already exists.")
 
     def get_match(self, uuid: UUID) -> MatchResponse | None:
         with self.session_factory() as session:
@@ -46,7 +46,7 @@ class MatchService:
             repository = SQLAlchemyRepository(session)
             match = repository.get_match_by_uuid(uuid)
             if not match:
-                raise MatchNonExists("Матч не существует.")
+                raise MatchNonExists("Match doesn't exist.")
             if player_side == Side.FIRST:
                 player = match.player1
             elif player_side == Side.SECOND:

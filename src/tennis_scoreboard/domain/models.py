@@ -27,7 +27,7 @@ class Player:
         if isinstance(other, Player):
             return self.name == other.name
         else:
-            raise NotImplementedError
+            raise NotImplementedError("Can't compare a player to another type.")
 
 
 @dataclass
@@ -114,7 +114,7 @@ class Match:
     @classmethod
     def new(cls, uuid: UUID, player1: Player, player2: Player) -> Match:
         if player1 == player2:
-            raise IdenticalPlayers("Нельзя играть с самим собой.")
+            raise IdenticalPlayers("A player cannot play against himself.")
         return cls(uuid=uuid, player1=player1, player2=player2, score=Score.new())
 
     @property
@@ -136,6 +136,6 @@ class Match:
         elif player.id == self.player2.id:
             side = Side.SECOND
         else:
-            raise MatchUnknownPlayer("Неизвестный участник матча.")
+            raise MatchUnknownPlayer("Unknown player.")
         if self.winner is None:
             self.score.add_point(side)

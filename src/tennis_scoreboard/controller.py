@@ -15,26 +15,33 @@ def register_routers(router: Router, service: MatchService, templates: Environme
 
     @router.get("/")
     def main_page():
-        template = templates.get_template("index.html")
-        html = template.render()
+        html = render_template("index.html")
         response = HTMLResponse(html, "200 OK")
         return response
 
     @router.get("/new-match")
     def match():
-        template = templates.get_template("new-match.html")
-        html = template.render()
+        html = render_template("new-match.html")
         response = HTMLResponse(html, "200 OK")
         return response
 
     @router.post("/new-match")
     def new_match(player1_name: str, player2_name: str):
         uuid = uuid4()
+        parsed_player1_name = player1_name.strip()
+        parsed_player2_name = player2_name.strip()
+        for name in (parsed_player1_name, parsed_player2_name):
+            if name == "" or len(name) > 30 or len(name) < 2:
+                html = render_template(
+                    "new-match.html",
+                    error="Unavailable name: name must contains 2 to 30 symbols.",
+                )
+                response = HTMLResponse(html, "400 Bad Request")
+                return response
         try:
             service.new_match(uuid, player1_name, player2_name)
         except Exception as e:
-            template = templates.get_template("new-match.html")
-            html = template.render(error=str(e))
+            html = render_template("new-match.html", error=str(e))
             response = HTMLResponse(html, "409 Conflict")
             return response
 
@@ -44,8 +51,7 @@ def register_routers(router: Router, service: MatchService, templates: Environme
     def match_score(uuid: str):
         match = service.get_match(UUID(uuid))
         is_active = service.match_is_active(UUID(uuid))
-        template = templates.get_template("match-score.html")
-        html = template.render(match=match, uuid=uuid, is_active=is_active)
+        html = render_template("matches.html", match=match, uuid=uuid, is_active=is_active)
         response = HTMLResponse(html, "200 OK")
         return response
 

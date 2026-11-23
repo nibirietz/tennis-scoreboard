@@ -68,4 +68,4 @@ class Router:
             if route.path == path and route.method == method:
                 params = self.parse_kwargs(route.func, **kwargs)
                 return route.func(*args, **params)
-        return Response("Not Founded", "404 Not Founded", "text/plain; charset=utf-8")
+        return Response("Not Found", "404 Not Found", "text/plain; charset=utf-8")

@@ -39,7 +39,7 @@ def register_routers(router: Router, service: MatchService, templates: Environme
                 response = HTMLResponse(html, "400 Bad Request")
                 return response
         try:
-            # service.new_match(uuid, parsed_player1_name, parsed_player2_name)
+            service.new_match(uuid, parsed_player1_name, parsed_player2_name)
         except Exception as e:
             html = render_template("new-match.html", error=str(e))
             response = HTMLResponse(html, "409 Conflict")

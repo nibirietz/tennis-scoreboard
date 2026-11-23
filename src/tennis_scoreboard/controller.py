@@ -34,12 +34,12 @@ def register_routers(router: Router, service: MatchService, templates: Environme
             if name == "" or len(name) > 30 or len(name) < 2:
                 html = render_template(
                     "new-match.html",
-                    error="Unavailable name: name must contains 2 to 30 symbols.",
+                    error="Unavailable name: name must contain 2 to 30 symbols.",
                 )
                 response = HTMLResponse(html, "400 Bad Request")
                 return response
         try:
-            service.new_match(uuid, player1_name, player2_name)
+            # service.new_match(uuid, parsed_player1_name, parsed_player2_name)
         except Exception as e:
             html = render_template("new-match.html", error=str(e))
             response = HTMLResponse(html, "409 Conflict")
@@ -51,7 +51,7 @@ def register_routers(router: Router, service: MatchService, templates: Environme
     def match_score(uuid: str):
         match = service.get_match(UUID(uuid))
         is_active = service.match_is_active(UUID(uuid))
-        html = render_template("matches.html", match=match, uuid=uuid, is_active=is_active)
+        html = render_template("match-score.html", match=match, uuid=uuid, is_active=is_active)
         response = HTMLResponse(html, "200 OK")
         return response
 

@@ -12,3 +12,6 @@ class MatchAlreadyExists(Exception):
 
 class MatchNonExists(Exception):
     pass
+
+class StringLengthExceeded(Exception):
+    pass

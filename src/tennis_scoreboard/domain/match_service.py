@@ -2,12 +2,16 @@ from collections.abc import Callable
 from contextlib import AbstractContextManager
 from uuid import UUID
 
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.orm import Session
 
 from tennis_scoreboard.domain.models import Match, Side
 from tennis_scoreboard.dto import MatchResponse
-from tennis_scoreboard.exceptions import MatchAlreadyExists, MatchNonExists
+from tennis_scoreboard.exceptions import (
+    MatchAlreadyExists,
+    MatchNonExists,
+    StringLengthExceeded,
+)
 from tennis_scoreboard.mapper import MatchMapper
 from tennis_scoreboard.repository.repository import SQLAlchemyRepository
 
@@ -33,6 +37,8 @@ class MatchService:
                 session.commit()
         except IntegrityError:
             raise MatchAlreadyExists("Match already exists.")
+        except DataError:
+            raise StringLengthExceeded("String length exceeded.")
 
     def get_match(self, uuid: UUID) -> MatchResponse | None:
         with self.session_factory() as session:
@@ -60,7 +66,6 @@ class MatchService:
             repository = SQLAlchemyRepository(session)
             matches = repository.get_matches(page, filtered_by)
             return [MatchMapper.match_to_response(match) for match in matches]
-
 
     def match_is_active(self, uuid: UUID) -> bool:
         with self.session_factory() as session:

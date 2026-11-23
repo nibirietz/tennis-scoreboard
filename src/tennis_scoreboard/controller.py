@@ -34,7 +34,7 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         uuid = uuid4()
         try:
             service.new_match(uuid, player1_name, player2_name)
-        except IdenticalPlayers as e:
+        except Exception as e:
             template = templates.get_template("new-match.html")
             html = template.render(error=str(e))
             response = HTMLResponse(html, "409 Conflict")

@@ -32,9 +32,11 @@
     <div class="container">
         <h1>Matches</h1>
         <div class="input-container">
-            <input class="input-filter" placeholder="Filter by name" type="text" />
+            <form method="post" action="/matches?page={{ page }}&filter_by_player_name={{ filter_by_player_name }}">
+                <input class="input-filter" placeholder="Filter by name" type="text" name="filter_by_player_name">
+            </form>
             <div>
-                <a href="/matches?={{ page }}">
+                <a href="/matches?page={{ page }}">
                     <button class="btn-filter">Reset Filter</button>
                 </a>
             </div>

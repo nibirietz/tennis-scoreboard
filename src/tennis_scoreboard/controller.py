@@ -57,14 +57,28 @@ def register_routers(router: Router, service: MatchService, templates: Environme
             player_side = Side.SECOND
         else:
             return RedirectResponse(f"/match?uuid={uuid}")
-        match = service.add_point(UUID(uuid), player_side)
-        html = render_template("match-score.html", match=match, uuid=uuid)
-        response = HTMLResponse(html, "201 OK")
+        service.add_point(UUID(uuid), player_side)
+        response = RedirectResponse(f"/match?uuid={uuid}")
         return response
 
     @router.get("/matches")
-    def get_matches(page: int = 1, filter_by_player_name: str | None = None):
-        matches = service.get_matches(page, filter_by_player_name)
-        html = render_template("matches.html", matches=matches)
+    def get_matches(page: int = 1, filter_by_player_name: str = ""):
+        parsed_filter_by_player_name = (
+            None if filter_by_player_name == "" else filter_by_player_name.strip()
+        )
+        matches = service.get_matches(page, parsed_filter_by_player_name)
+        html = render_template(
+            "matches.html",
+            matches=matches,
+            page=page,
+            filter_by_player_name=filter_by_player_name,
+        )
         response = HTMLResponse(html, "200 OK")
+        return response
+
+    @router.post("/matches")
+    def post_filter_matches(page: int = 1, filter_by_player_name: str = ""):
+        response = RedirectResponse(
+            f"/matches?page={page}&filter_by_player_name={filter_by_player_name}"
+        )
         return response

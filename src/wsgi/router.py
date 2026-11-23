@@ -47,6 +47,8 @@ class Router:
             key_type = hints.get(key, None)
             if not get_origin(key_type) is list and len(value) == 1:
                 kwargs[key] = kwargs[key][0]
+                if key_type is int:
+                    kwargs[key] = int(kwargs[key])
         return kwargs
 
     def handle(self, path: str, method: str, *args, **kwargs) -> Response:

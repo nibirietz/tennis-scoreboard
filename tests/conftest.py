@@ -12,7 +12,7 @@ from tennis_scoreboard.repository.orm_models import Base
 
 @pytest.fixture(scope="session")
 def test_engine() -> Generator[Engine]:
-    with PostgresContainer("postgres:16-alpine", driver="psycopg") as postgres:
+    with PostgresContainer("postgres:18-alpine", driver="psycopg") as postgres:
         engine: Engine = create_engine(postgres.get_connection_url())
         Base.metadata.create_all(engine)
         yield engine

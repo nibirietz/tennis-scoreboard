@@ -1,9 +1,11 @@
+import json
 import mimetypes
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from urllib.parse import parse_qs
 
 from wsgi.router import Router
+from wsgi.response import Response
 
 
 class Application:
@@ -64,25 +66,40 @@ class Application:
         path: str = environ.get("PATH_INFO", "")
         method: str = environ.get("REQUEST_METHOD", "")
         query_params = self.parse_query(environ)
-        if method == "GET":
-            if "/static/" in path:
-                body = self.serve_static(path, start_response)
-                return body
-            else:
+        if "/static/" in path and method == "GET":
+            body = self.serve_static(path, start_response)
+            return body
+
+        try:
+            if method == "GET":
                 result = self.router.handle(path, method, **query_params)
                 return self.send_response(
                     start_response, result.body, result.headers, result.status
                 )
-        if method == "POST":
-            content_length = int(environ.get("CONTENT_LENGTH", 0))
-            post_body = (
-                environ.get("wsgi.input", "").read(content_length).decode("utf-8")
+            if method == "POST":
+                content_length = int(environ.get("CONTENT_LENGTH", 0))
+                post_body = (
+                    environ.get("wsgi.input", "").read(content_length).decode("utf-8")
+                )
+                form_data = parse_qs(post_body)
+                params = query_params | form_data
+                result = self.router.handle(path, method, **params)
+                return self.send_response(
+                    start_response, result.body, result.headers, result.status
+                )
+
+        except Exception as e:
+            message = {"message": str(e)}
+            response = Response(
+                json.dumps(message),
+                "500 Internal Server Error",
+                "application/json; charset=utf-8",
             )
-            form_data = parse_qs(post_body)
-            params = query_params | form_data
-            result = self.router.handle(path, method, **params)
             return self.send_response(
-                start_response, result.body, result.headers, result.status
+                start_response,
+                json.dumps(message).encode("utf-8"),
+                response.headers,
+                response.status,
             )
 
 

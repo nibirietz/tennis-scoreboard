@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from typing import ParamSpec, get_origin, get_type_hints
 
+from wsgi.exceptions import ParsingError
 from wsgi.response import Response
 
 F_Spec = ParamSpec("F_Spec")
@@ -43,13 +44,24 @@ class Router:
 
     def parse_kwargs(self, func: Callable[F_Spec, object], **kwargs: list) -> dict:
         hints = get_type_hints(func)
+        parsed_kwargs = {}
         for key, value in kwargs.items():
+            if key not in hints:
+                continue
             key_type = hints.get(key, None)
-            if not get_origin(key_type) is list and len(value) == 1:
-                kwargs[key] = kwargs[key][0]
-                if key_type is int:
-                    kwargs[key] = int(kwargs[key])
-        return kwargs
+            try:
+                if not get_origin(key_type) is list and len(value) == 1:
+                    if key_type is int:
+                        parsed_kwargs[key] = int(kwargs[key][0])
+                    else:
+                        parsed_kwargs[key] = kwargs[key][0]
+                else:
+                    parsed_kwargs[key] = value
+            except ValueError as e:
+                raise ValueError("Wrong type.") from e
+            except (TypeError, IndexError) as e:
+                raise ParsingError("Parsing query parameters error.") from e
+        return parsed_kwargs
 
     def handle(self, path: str, method: str, *args, **kwargs) -> Response:
         for route in self.routes:

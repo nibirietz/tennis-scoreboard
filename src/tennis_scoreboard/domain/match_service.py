@@ -60,3 +60,13 @@ class MatchService:
             repository = SQLAlchemyRepository(session)
             matches = repository.get_matches(page, filtered_by)
             return [MatchMapper.match_to_response(match) for match in matches]
+
+
+    def match_is_active(self, uuid: UUID) -> bool:
+        with self.session_factory() as session:
+            repository = SQLAlchemyRepository(session)
+            match = repository.get_match_by_uuid(uuid)
+            if match:
+                return match.winner is None
+            else:
+                raise MatchNonExists

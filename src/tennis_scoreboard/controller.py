@@ -44,8 +44,9 @@ def register_routers(router: Router, service: MatchService, templates: Environme
     @router.get("/match")
     def match_score(uuid: str):
         match = service.get_match(UUID(uuid))
+        is_active = service.match_is_active(UUID(uuid))
         template = templates.get_template("match-score.html")
-        html = template.render(match=match, uuid=uuid)
+        html = template.render(match=match, uuid=uuid, is_active=is_active)
         response = HTMLResponse(html, "200 OK")
         return response
 

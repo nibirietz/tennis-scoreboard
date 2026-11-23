@@ -51,9 +51,11 @@
                     <td class="table-text">{{ match.score.player1_games }}</td>
                     <td class="table-text">{{ match.score.player1_points }}</td>
                     <td class="table-text">
+                        {% if is_active %}
                         <form method="post" action="/match?uuid={{ uuid }}">
                             <button class="form-button" type="submit" name="player_number" value="1">Score</button>
                         </form>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr class="player2">
@@ -62,15 +64,20 @@
                     <td class="table-text">{{ match.score.player2_games }}</td>
                     <td class="table-text">{{ match.score.player2_points }}</td>
                     <td class="table-text">
+                        {% if is_active %}
                         <form method="post" action="/match?uuid={{ uuid }}">
                             <button class="form-button" type="submit" name="player_number" value="2">Score</button>
                         </form>
+                        {% endif %}
                     </td>
                 </tr>
                 </tbody>
             </table>
         </section>
     </div>
+    {% if not is_active %}
+    <p style="text-align: center;">{{ match.winner_name }} is win!</p>
+    {% endif %}
 </main>
 <footer>
     <div class="footer">

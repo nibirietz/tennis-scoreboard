@@ -4,8 +4,8 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from urllib.parse import parse_qs
 
-from wsgi.router import Router
 from wsgi.response import Response
+from wsgi.router import Router
 
 
 class Application:

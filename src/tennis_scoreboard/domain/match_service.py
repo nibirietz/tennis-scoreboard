@@ -21,6 +21,7 @@ SessionFactory = Callable[[], AbstractContextManager[Session]]
 class MatchService:
     def __init__(self, session_factory: SessionFactory):
         self.session_factory: SessionFactory = session_factory
+        self.active_matches: dict[UUID, Match] = {}
 
     def new_match(self, uuid: UUID, player1_name: str, player2_name: str):
         try:
@@ -35,31 +36,39 @@ class MatchService:
                 match = Match.new(uuid, player1, player2)
                 repository.create_match(match)
                 session.commit()
+                self.active_matches[uuid] = match
         except IntegrityError:
             raise MatchAlreadyExists("Match already exists.")
         except DataError:
             raise StringLengthExceeded("String length exceeded.")
 
     def get_match(self, uuid: UUID) -> MatchResponse | None:
-        with self.session_factory() as session:
-            repository = SQLAlchemyRepository(session)
-            match = repository.get_match_by_uuid(uuid)
-            if match:
+        match = self.active_matches.get(uuid, None)
+        if match is None:
+            with self.session_factory() as session:
+                repository = SQLAlchemyRepository(session)
+                match = repository.get_match_by_uuid(uuid)
+                if match is None:
+                    raise MatchNonExists("Match doesn't exist.")
                 return MatchMapper.match_to_response(match)
+        return MatchMapper.match_to_response(match)
 
     def add_point(self, uuid: UUID, player_side: Side):
-        with self.session_factory() as session:
-            repository = SQLAlchemyRepository(session)
-            match = repository.get_match_by_uuid(uuid)
-            if not match:
-                raise MatchNonExists("Match doesn't exist.")
-            if player_side == Side.FIRST:
-                player = match.player1
-            elif player_side == Side.SECOND:
-                player = match.player2
-            match.add_point(player)
-            repository.update_match_score(match)
-            session.commit()
+        match = self.active_matches.get(uuid, None)
+        if match is None:
+            raise MatchNonExists("Match doesn't exist.")
+        if player_side == Side.FIRST:
+            player = match.player1
+        elif player_side == Side.SECOND:
+            player = match.player2
+        match.add_point(player)
+        self.active_matches[uuid] = match
+        if not match.winner is None:
+            with self.session_factory() as session:
+                repository = SQLAlchemyRepository(session)
+                repository.update_match_score(match)
+                session.commit()
+                self.active_matches.pop(uuid)
 
     def get_matches(self, page: int, filtered_by: str | None) -> list[MatchResponse]:
         with self.session_factory() as session:
@@ -68,10 +77,7 @@ class MatchService:
             return [MatchMapper.match_to_response(match) for match in matches]
 
     def match_is_active(self, uuid: UUID) -> bool:
-        with self.session_factory() as session:
-            repository = SQLAlchemyRepository(session)
-            match = repository.get_match_by_uuid(uuid)
-            if match:
-                return match.winner is None
-            else:
-                raise MatchNonExists
+        match = self.active_matches.get(uuid, None)
+        if match is None:
+            return False
+        return match.winner is None

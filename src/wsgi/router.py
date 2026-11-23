@@ -52,9 +52,9 @@ class Router:
             try:
                 if not get_origin(key_type) is list and len(value) == 1:
                     if key_type is int:
-                        parsed_kwargs[key] = int(kwargs[key][0])
+                        parsed_kwargs[key] = int(value[0])
                     else:
-                        parsed_kwargs[key] = kwargs[key][0]
+                        parsed_kwargs[key] = value[0]
                 else:
                     parsed_kwargs[key] = value
             except ValueError as e:

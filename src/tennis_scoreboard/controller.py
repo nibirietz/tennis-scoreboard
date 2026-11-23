@@ -1,11 +1,9 @@
-from math import ceil
 from uuid import UUID, uuid4
 
 from jinja2 import Environment
 
 from tennis_scoreboard.domain.match_service import MatchService
 from tennis_scoreboard.domain.models import Side
-from tennis_scoreboard.exceptions import IdenticalPlayers
 from wsgi import Router
 from wsgi.response import HTMLResponse, RedirectResponse
 

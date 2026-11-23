@@ -52,9 +52,8 @@ class MatchService:
             elif player_side == Side.SECOND:
                 player = match.player2
             match.add_point(player)
-            match = repository.update_match_score(match)
+            repository.update_match_score(match)
             session.commit()
-            return MatchMapper.match_to_response(match)
 
     def get_matches(self, page: int, filtered_by: str | None) -> list[MatchResponse]:
         with self.session_factory() as session:

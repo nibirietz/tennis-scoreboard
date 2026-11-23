@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from sqlalchemy import URL, create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from waitress import serve
+from whitenoise import WhiteNoise
 
 from tennis_scoreboard.controller import register_routers
 from tennis_scoreboard.domain.match_service import MatchService
@@ -55,5 +56,6 @@ if __name__ == "__main__":
     service = MatchService(get_session)
     register_routers(router, service, templates)
     app = Application(router, BASE_DIR / "static", BASE_DIR / "templates")
+    app = WhiteNoise(app, root=BASE_DIR / 'static/', prefix='static/', max_age=31536000)
 
     main(app, server_port)

@@ -28,8 +28,8 @@ def test_create_match_with_exists_players(match_service: MatchService):
     player2_name = "Michael"
     with match_service.session_factory() as session:
         repository = SQLAlchemyRepository(session)
-        _ = repository.create_player(player1_name)
-        _ = repository.create_player(player2_name)
+        repository.create_player(player1_name)
+        repository.create_player(player2_name)
     uuid = uuid4()
     match_service.new_match(uuid, player1_name, player2_name)
     match = get_match_by_uuid(match_service, uuid)
@@ -50,7 +50,7 @@ def test_create_new_match_with_non_exists_player(match_service: MatchService):
 
 
 def test_add_point_first_player(match_service: MatchService, default_match_id: UUID):
-    _ = match_service.add_point(default_match_id, Side.FIRST)
+    match_service.add_point(default_match_id, Side.FIRST)
     match = get_match_by_uuid(match_service, default_match_id)
     assert match is not None
     assert match.score.get_points(Side.FIRST) == 1

@@ -25,7 +25,7 @@ def main(app, server_port):
 
 
 if __name__ == "__main__":
-    _ = load_dotenv()
+    load_dotenv()
     server_port = getenv("BACKEND_PORT")
     router = Router()
 
@@ -46,7 +46,6 @@ if __name__ == "__main__":
         session: Session = SessionLocal()
         try:
             yield session
-            session.commit()
         except Exception:
             session.rollback()
             raise

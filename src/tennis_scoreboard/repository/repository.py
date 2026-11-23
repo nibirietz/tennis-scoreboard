@@ -69,7 +69,7 @@ class SQLAlchemyRepository:
         if player:
             return self.player_to_model(player)
 
-    def create_player(self, name: str):
+    def create_player(self, name: str) -> Player:
         player_orm = PlayerORM(name=name)
         self.session.add(player_orm)
         self.session.flush()
@@ -79,7 +79,6 @@ class SQLAlchemyRepository:
         match_orm = self.match_to_orm(match)
         self.session.add(match_orm)
         self.session.flush()
-        return match
 
     def update_match_score(self, match: Match) -> Match:
         stmt = (
@@ -90,7 +89,7 @@ class SQLAlchemyRepository:
                 winner_id=match.winner.id if match.winner is not None else None,
             )
         )
-        _ = self.session.execute(stmt)
+        self.session.execute(stmt)
         self.session.flush()
         return match
 

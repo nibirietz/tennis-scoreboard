@@ -29,15 +29,17 @@ class MatchService:
                 if player2 is None:
                     player2 = repository.create_player(player2_name)
                 match = Match.new(uuid, player1, player2)
-                _ = repository.create_match(match)
+                repository.create_match(match)
+                session.commit()
         except IntegrityError:
             raise MatchAlreadyExists("Матч уже существует.")
 
-    def get_match(self, uuid: UUID):
+    def get_match(self, uuid: UUID) -> MatchResponse | None:
         with self.session_factory() as session:
             repository = SQLAlchemyRepository(session)
             match = repository.get_match_by_uuid(uuid)
-            return MatchMapper.match_to_response(match)
+            if match:
+                return MatchMapper.match_to_response(match)
 
     def add_point(self, uuid: UUID, player_side: Side):
         with self.session_factory() as session:
@@ -51,6 +53,7 @@ class MatchService:
                 player = match.player2
             match.add_point(player)
             match = repository.update_match_score(match)
+            session.commit()
             return MatchMapper.match_to_response(match)
 
     def get_matches(self, page: int, filtered_by: str | None) -> list[MatchResponse]:

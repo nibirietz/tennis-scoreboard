@@ -58,11 +58,15 @@
         </table>
 
         <div class="pagination">
-            <a class="prev" href="#"> < </a>
+            {% if page > 1 %}
+            <a class="prev" href="/matches?page={{ page - 1 }}"> < </a>
+            {% endif %}
             <a class="num-page current" href="#">1</a>
             <a class="num-page" href="#">2</a>
             <a class="num-page" href="#">3</a>
-            <a class="next" href="#"> > </a>
+            {% if page > 0 %}
+            <a class="next" href="/matches?page={{ page + 1 }}"> > </a>
+            {% endif %}
         </div>
     </div>
 </main>

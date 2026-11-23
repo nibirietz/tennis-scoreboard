@@ -27,7 +27,7 @@ class Player:
         if isinstance(other, Player):
             return self.name == other.name
         else:
-            raise NotImplementedError("Can't compare a player to another type.")
+            return NotImplemented
 
 
 @dataclass

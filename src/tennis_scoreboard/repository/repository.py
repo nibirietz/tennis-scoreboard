@@ -96,7 +96,7 @@ class SQLAlchemyRepository:
     def get_matches(self, page: int, filtered_by: str | None) -> list[Match]:
         stmt = (
             select(MatchORM)
-            .order_by(MatchORM.id)
+            .order_by(MatchORM.id.desc())
             .where(MatchORM.winner_id.is_not(None))
             .options(
                 joinedload(MatchORM.player1),

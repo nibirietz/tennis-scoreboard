@@ -4,29 +4,32 @@ from jinja2 import Environment
 
 from tennis_scoreboard.domain.match_service import MatchService
 from tennis_scoreboard.domain.models import Side
-from wsgi import Router
-from wsgi.response import HTMLResponse, RedirectResponse
+from wsgi import HTMLResponse, RedirectResponse, Router
 
 
-def register_routers(router: Router, service: MatchService, templates: Environment):
-    def render_template(template_name: str, **kwargs) -> str:
+def register_routers(
+    router: Router, service: MatchService, templates: Environment
+) -> None:
+    def render_template(template_name: str, **kwargs: object) -> str:
         template = templates.get_template(template_name)
         return template.render(**kwargs)
 
     @router.get("/")
-    def main_page():
+    def main_page() -> HTMLResponse:
         html = render_template("index.html")
         response = HTMLResponse(html, "200 OK")
         return response
 
     @router.get("/new-match")
-    def match():
+    def match() -> HTMLResponse:
         html = render_template("new-match.html")
         response = HTMLResponse(html, "200 OK")
         return response
 
     @router.post("/new-match")
-    def new_match(player1_name: str, player2_name: str):
+    def new_match(
+        player1_name: str, player2_name: str
+    ) -> HTMLResponse | RedirectResponse:
         uuid = uuid4()
         parsed_player1_name = player1_name.strip()
         parsed_player2_name = player2_name.strip()
@@ -48,15 +51,17 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         return RedirectResponse(f"/match?uuid={uuid}")
 
     @router.get("/match")
-    def match_score(uuid: str):
+    def match_score(uuid: str) -> HTMLResponse:
         match = service.get_match(UUID(uuid))
         is_active = service.match_is_active(UUID(uuid))
-        html = render_template("match-score.html", match=match, uuid=uuid, is_active=is_active)
+        html = render_template(
+            "match-score.html", match=match, uuid=uuid, is_active=is_active
+        )
         response = HTMLResponse(html, "200 OK")
         return response
 
     @router.post("/match")
-    def add_point(uuid: str, player_number: int):
+    def add_point(uuid: str, player_number: int) -> HTMLResponse | RedirectResponse:
         if player_number == 1:
             player_side = Side.FIRST
         elif player_number == 2:
@@ -65,12 +70,14 @@ def register_routers(router: Router, service: MatchService, templates: Environme
             return RedirectResponse(f"/match?uuid={uuid}")
         match = service.add_point(UUID(uuid), player_side)
         is_active = service.match_is_active(UUID(uuid))
-        html = render_template("partial-match-score.html", match=match, uuid=uuid, is_active=is_active)
+        html = render_template(
+            "partial-match-score.html", match=match, uuid=uuid, is_active=is_active
+        )
         response = HTMLResponse(html, "200 OK")
         return response
 
     @router.get("/matches")
-    def get_matches(page: int = 1, filter_by_player_name: str = ""):
+    def get_matches(page: int = 1, filter_by_player_name: str = "") -> HTMLResponse:
         parsed_filter_by_player_name = (
             None if filter_by_player_name == "" else filter_by_player_name.strip()
         )
@@ -85,7 +92,9 @@ def register_routers(router: Router, service: MatchService, templates: Environme
         return response
 
     @router.post("/matches")
-    def post_filter_matches(page: int = 1, filter_by_player_name: str = ""):
+    def post_filter_matches(
+        page: int = 1, filter_by_player_name: str = ""
+    ) -> RedirectResponse:
         response = RedirectResponse(
             f"/matches?page={page}&filter_by_player_name={filter_by_player_name}"
         )

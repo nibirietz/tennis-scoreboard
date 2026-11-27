@@ -18,7 +18,7 @@ class SQLAlchemyRepository:
             name=player.name,
         )
 
-    def score_to_model(self, score: dict[str, list[int]]):
+    def score_to_model(self, score: dict[str, list[int]]) -> Score:
         return Score(
             score["game_points"],
             score["set_games"],
@@ -43,7 +43,7 @@ class SQLAlchemyRepository:
             "match_sets": [score.get_sets(Side.FIRST), score.get_sets(Side.SECOND)],
         }
 
-    def match_to_orm(self, match: Match):
+    def match_to_orm(self, match: Match) -> MatchORM:
         return MatchORM(
             uuid=match.uuid,
             player1_id=match.player1.id,
@@ -62,11 +62,10 @@ class SQLAlchemyRepository:
         if match:
             return self.match_to_model(match)
 
-
     def get_player(self, name: str) -> Player | None:
         stmt = select(PlayerORM).where(PlayerORM.name == name)
         player = self.session.scalars(stmt).one_or_none()
-        if player:
+        if player is not None:
             return self.player_to_model(player)
 
     def create_player(self, name: str) -> Player:
@@ -75,7 +74,7 @@ class SQLAlchemyRepository:
         self.session.flush()
         return self.player_to_model(player_orm)
 
-    def create_match(self, match: Match):
+    def create_match(self, match: Match) -> None:
         match_orm = self.match_to_orm(match)
         self.session.add(match_orm)
         self.session.flush()
